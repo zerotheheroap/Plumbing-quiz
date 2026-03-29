@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L2 Plumbing Quiz</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500&display=swap');
+  :root {
+    --bg: #0f0f0f; --surface: #181818; --border: #2a2a2a;
+    --accent: #e8c547; --accent2: #4ec9b0; --danger: #f44747;
+    --success: #4ec94e; --text: #d4d4d4; --muted: #666;
+    --correct-bg: #1a2e1a; --wrong-bg: #2e1a1a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+  header { width: 100%; max-width: 700px; margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+  .title { font-family: 'Barlow Condensed', sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--accent); letter-spacing: 0.04em; text-transform: uppercase; }
+  .subtitle { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); margin-top: 4px; letter-spacing: 0.08em; }
+  .stats-bar { display: flex; gap: 24px; margin-top: 16px; flex-wrap: wrap; }
+  .stat { font-family: 'DM Mono', monospace; font-size: 0.8rem; }
+  .stat span { color: var(--accent); font-weight: 500; }
+  .filter-bar { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .filter-btn { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 10px; border-radius: 3px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+  .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(232,197,71,0.07); }
+  .progress-track { width: 100%; max-width: 700px; height: 3px; background: var(--border); margin-bottom: 28px; border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); transition: width 0.4s ease; border-radius: 2px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 28px; width: 100%; max-width: 700px; margin-bottom: 16px; }
+  .category-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent2); margin-bottom: 12px; }
+  .question-text { font-size: 1.05rem; font-weight: 500; line-height: 1.6; color: #e8e8e8; margin-bottom: 24px; }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option { background: transparent; border: 1px solid var(--border); border-radius: 3px; padding: 12px 16px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 0.95rem; text-align: left; cursor: pointer; transition: all 0.15s ease; display: flex; align-items: flex-start; gap: 12px; }
+  .option:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: rgba(232,197,71,0.05); }
+  .option:disabled { cursor: default; }
+  .option-key { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); min-width: 18px; margin-top: 2px; }
+  .option.correct { border-color: var(--success); background: var(--correct-bg); color: var(--success); }
+  .option.wrong { border-color: var(--danger); background: var(--wrong-bg); color: var(--danger); }
+  .option.correct .option-key, .option.wrong .option-key { color: inherit; opacity: 0.6; }
+  .feedback { margin-top: 18px; padding: 14px 16px; border-radius: 3px; font-size: 0.9rem; line-height: 1.6; display: none; }
+  .feedback.show { display: block; }
+  .feedback.correct-fb { background: var(--correct-bg); border-left: 3px solid var(--success); color: #9fd49f; }
+  .feedback.wrong-fb { background: var(--wrong-bg); border-left: 3px solid var(--danger); color: #d49f9f; }
+  .next-btn { margin-top: 16px; background: var(--accent); color: #0f0f0f; border: none; padding: 12px 28px; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; border-radius: 3px; display: none; transition: opacity 0.15s; }
+  .next-btn:hover { opacity: 0.85; }
+  .next-btn.show { display: inline-block; }
+  .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 40px; width: 100%; max-width: 700px; text-align: center; display: none; }
+  .result-card.show { display: block; }
+  .result-score { font-family: 'Barlow Condensed', sans-serif; font-size: 5rem; font-weight: 800; color: var(--accent); line-height: 1; }
+  .result-label { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); letter-spacing: 0.1em; margin-top: 6px; margin-bottom: 24px; }
+  .result-breakdown { text-align: left; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 8px; }
+  .breakdown-title { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+  .missed-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; color: #c4a0a0; line-height: 1.5; }
+  .missed-item strong { color: var(--text); font-weight: 500; }
+  .btn-row { display: flex; gap: 12px; justify-content: center; margin-top: 28px; flex-wrap: wrap; }
+  .restart-btn { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 12px 28px; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; border-radius: 3px; transition: all 0.15s; }
+  .restart-btn:hover { background: var(--accent); color: #0f0f0f; }
+  .restart-btn.missed-only { border-color: var(--danger); color: var(--danger); }
+  .restart-btn.missed-only:hover { background: var(--danger); color: #0f0f0f; }
+  .quiz-area { width: 100%; max-width: 700px; }
+  .start-screen { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 32px; width: 100%; max-width: 700px; }
+  .start-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .start-desc { font-size: 0.9rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+  .start-btn { background: var(--accent); color: #0f0f0f; border: none; padding: 14px 32px; font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title">L2 Plumbing — Revision Quiz</div>
+  <div class="subtitle">ELECTRICAL · SCIENTIFIC · PROCESSES · H&S · CONSTRUCTION</div>
+  <div class="stats-bar">
+    <div class="stat">Q <span id="qNum">—</span> of <span id="qTotal">—</span></div>
+    <div class="stat">Score <span id="score">0</span></div>
+    <div class="stat">Wrong <span id="wrong">0</span></div>
+  </div>
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" onclick="setFilter('All')">All</button>
+    <button class="filter-btn" onclick="setFilter('Electrical')">Electrical</button>
+    <button class="filter-btn" onclick="setFilter('Scientific')">Scientific</button>
+    <button class="filter-btn" onclick="setFilter('Processes')">Processes</button>
+    <button class="filter-btn" onclick="setFilter('Health & Safety')">H&amp;S</button>
+    <button class="filter-btn" onclick="setFilter('Construction')">Construction</button>
+  </div>
+</header>
+
+<div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+<div class="quiz-area" id="quizArea">
+  <div class="card" id="questionCard">
+    <div class="category-tag" id="categoryTag"></div>
+    <div class="question-text" id="questionText"></div>
+    <div class="options" id="optionsContainer"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next →</button>
+  </div>
+</div>
+
+<div class="result-card" id="resultCard">
+  <div class="result-score" id="finalScore"></div>
+  <div class="result-label">FINAL SCORE</div>
+  <div id="resultMessage" style="font-size:1rem;color:var(--muted);margin-bottom:16px;"></div>
+  <div class="result-breakdown" id="breakdown"></div>
+  <div class="btn-row">
+    <button class="restart-btn" onclick="restart(false)">Restart (All)</button>
+    <button class="restart-btn missed-only" id="missedBtn" onclick="restart(true)">Retry Missed Only</button>
+  </div>
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+  // ── ELECTRICAL (30) ──────────────────────────────────────────────
+  {cat:"Electrical",q:"What is the formula for electrical power using voltage and current?",opts:["P = V ÷ I","P = V × I","P = I ÷ V","P = V + I"],ans:1,exp:"P = V × I. Power (watts) = voltage (volts) × current (amps)."},
+  {cat:"Electrical",q:"In a parallel circuit, what remains the same across all branches?",opts:["Current","Resistance","Voltage","Power"],ans:2,exp:"Voltage is the same across all parallel branches. Current splits between them."},
+  {cat:"Electrical",q:"What does a Class II appliance rely on for safety?",opts:["Earth conductor","Double insulation — no earth required","SELV supply","RCD protection"],ans:1,exp:"Class II = double insulated. No earth required. Symbol: square within a square."},
+  {cat:"Electrical",q:"At what current does a standard RCD trip for personal protection?",opts:["10mA","100mA","30mA","300mA"],ans:2,exp:"30mA for personal protection. 100mA and 300mA are for fire and equipment protection."},
+  {cat:"Electrical",q:"In the safe isolation procedure, when do you prove the test instrument is working?",opts:["Before and after testing the dead circuit","Only before testing","Only after testing","At the start of the day"],ans:0,exp:"Prove tester BEFORE testing (on a known live source), then prove it AGAIN after. Sandwich the dead test."},
+  {cat:"Electrical",q:"Which earthing arrangement is most common in UK domestic properties?",opts:["TN-S","TT","TN-C-S (PME)","IT"],ans:2,exp:"TN-C-S (PME). Combined PEN conductor splits at the cut-out. Most common UK domestic."},
+  {cat:"Electrical",q:"What is the voltage drop limit for a power circuit?",opts:["3%","5%","10%","2%"],ans:1,exp:"5% for power circuits, 3% for lighting circuits — textbook confirmed."},
+  {cat:"Electrical",q:"Which wiring system is used where fire resistance is required in extreme environments?",opts:["SWA","Flat twin and earth","MICC (Pyro)","Conduit and trunking"],ans:2,exp:"MICC (Mineral Insulated Copper Clad / Pyro) — fire resistant, used in extreme environments."},
+  {cat:"Electrical",q:"What does SELV stand for?",opts:["Safe Electrical Low Voltage","Separated Extra Low Voltage","Standard Extra Low Voltage","Shielded Earth Low Voltage"],ans:1,exp:"Separated Extra Low Voltage — max 50V AC / 120V DC ripple-free. Isolated from earth and other circuits."},
+  {cat:"Electrical",q:"In a series circuit with resistors of 4Ω, 6Ω and 10Ω, what is the total resistance?",opts:["2Ω","20Ω","2.4Ω","5Ω"],ans:1,exp:"Series: R total = R1 + R2 + R3 = 4 + 6 + 10 = 20Ω."},
+  {cat:"Electrical",q:"What colour is the Line (Live) conductor in post-2004 UK wiring?",opts:["Red","Black","Brown","Blue"],ans:2,exp:"Post-2004: Brown = Line, Blue = Neutral, Green/Yellow = Earth."},
+  {cat:"Electrical",q:"An RCBO combines which two protective devices?",opts:["Fuse and MCB","RCD and MCB","RCD and fuse","MCB and surge protector"],ans:1,exp:"RCBO = RCD + MCB. Protects against earth faults AND overload/short circuit in one unit."},
+  {cat:"Electrical",q:"In a series circuit, which of the following is the same throughout?",opts:["Voltage","Resistance","Current","Power"],ans:2,exp:"Current is the same throughout a series circuit. Voltage splits across components."},
+  {cat:"Electrical",q:"What is the formula for resistance using Ohm's Law?",opts:["R = V × I","R = I ÷ V","R = V ÷ I","R = V + I"],ans:2,exp:"R = V ÷ I. Resistance (ohms) = voltage (volts) divided by current (amps)."},
+  {cat:"Electrical",q:"A TT earthing system differs from TN-C-S because:",opts:["It has a combined PEN conductor","It uses an earth electrode at the premises with no metallic return path","It splits the neutral and earth at the substation","It is only used commercially"],ans:1,exp:"TT uses an earth electrode at the premises. No metallic earth return path back to the supplier."},
+  {cat:"Electrical",q:"What does a fuse do that an MCB cannot?",opts:["Reset automatically after a trip","Protect against earth faults","Melt to break the circuit — single use","Detect current imbalance"],ans:2,exp:"A fuse melts to break the circuit and is single-use. An MCB is resettable."},
+  {cat:"Electrical",q:"What is PELV, and how does it differ from SELV?",opts:["Protected Extra Low Voltage — connected to earth; SELV is isolated from earth","Same as SELV but higher voltage","PELV is for lighting only","PELV uses DC only"],ans:0,exp:"PELV = Protected Extra Low Voltage — connected to earth. SELV is Separated — isolated from earth and all other circuits."},
+  {cat:"Electrical",q:"Calculate the current drawn by a 2300W appliance on a 230V supply.",opts:["0.1A","23A","10A","100A"],ans:2,exp:"I = P ÷ V = 2300 ÷ 230 = 10A."},
+  {cat:"Electrical",q:"What voltage is used for standard portable tools on a construction site?",opts:["25V","230V","110V","400V"],ans:2,exp:"110V (yellow) is standard for site portable tools. Reduces shock risk if cable is cut."},
+  {cat:"Electrical",q:"What does equipotential bonding do?",opts:["Increases current flow","Connects metalwork to prevent voltage differences between conductive parts","Protects against overload","Reduces resistance in the circuit"],ans:1,exp:"Equipotential bonding connects metalwork (pipes, structural steel) to prevent dangerous voltage differences."},
+  {cat:"Electrical",q:"Which wiring system is used for underground runs or where mechanical protection is needed?",opts:["Flat twin and earth (6242Y)","MICC","SWA (Steel Wire Armoured)","Conduit only"],ans:2,exp:"SWA — Steel Wire Armoured. Used underground or where mechanical protection is required."},
+  {cat:"Electrical",q:"What was the old cable colour for Neutral before 2004?",opts:["Red","Green","Blue","Black"],ans:3,exp:"Old colours: Red = Live, Black = Neutral, Green = Earth."},
+  {cat:"Electrical",q:"In a parallel circuit with three resistors of 6Ω, 12Ω and 4Ω, what is the total resistance?",opts:["22Ω","2Ω","4Ω","0.5Ω"],ans:1,exp:"1/R = 1/6 + 1/12 + 1/4 = 2/12 + 1/12 + 3/12 = 6/12 = 0.5. So R = 2Ω."},
+  {cat:"Electrical",q:"Total resistance in a parallel circuit is always:",opts:["Greater than the largest branch","Equal to the smallest branch","Less than the smallest branch","The average of all branches"],ans:2,exp:"Total parallel resistance is always less than the smallest individual branch resistance."},
+  {cat:"Electrical",q:"What GS38 requires is:",opts:["Earthing of all metalwork","Use of approved test leads during electrical testing","Isolation of circuits before work","Use of RCDs on all circuits"],ans:1,exp:"GS38 specifies approved test leads and probes for electrical testing — insulated, fused, correct rating."},
+  {cat:"Electrical",q:"A 230V appliance draws 5A. What is its power consumption?",opts:["920W","46W","1150W","235W"],ans:2,exp:"P = V × I = 230 × 5 = 1150W."},
+  {cat:"Electrical",q:"Class III appliances operate at what maximum voltage?",opts:["25V AC","110V AC","50V AC / 120V DC ripple-free","12V DC only"],ans:2,exp:"Class III operates at SELV — max 50V AC or 120V DC ripple-free."},
+  {cat:"Electrical",q:"Which step in safe isolation comes immediately after switching off at the CU?",opts:["Test the circuit is dead","Prove the tester on a live source","Lock off and fit warning notice","Identify the circuit"],ans:2,exp:"Step 3: Lock off (secure the isolation) and fit a warning notice before any testing."},
+  {cat:"Electrical",q:"What does an MCB trip on?",opts:["Earth leakage only","Overload or short circuit","Voltage drop","Neutral fault"],ans:1,exp:"MCB trips on overload or short circuit. It does not detect earth leakage — that's the RCD."},
+  {cat:"Electrical",q:"Resistance in a metallic conductor increases when:",opts:["Cross-sectional area increases","Length decreases","Temperature increases","Voltage increases"],ans:2,exp:"In metals, resistance increases with temperature. Also increases with length, decreases with larger cross-section."},
+
+  // ── SCIENTIFIC (25) ──────────────────────────────────────────────
+  {cat:"Scientific",q:"What is the specific heat capacity of water?",opts:["4.5 kJ/kg·K","4.187 kJ/kg·K","3.9 kJ/kg·K","4.0 kJ/kg·K"],ans:1,exp:"4.187 kJ/kg·K — textbook confirmed. Used in Q = m × c × ΔT."},
+  {cat:"Scientific",q:"What does latent heat cause?",opts:["A temperature rise","A change of state with no temperature change","Thermal expansion","Increased pressure"],ans:1,exp:"Latent heat changes state (e.g. liquid to gas) with no temperature change during the transition."},
+  {cat:"Scientific",q:"1 metre head of water equals approximately how much pressure?",opts:["1 kPa","9.81 kPa","100 kPa","0.981 kPa"],ans:1,exp:"1m head = 9.81 kPa. Approximately 10 kPa is used in practice."},
+  {cat:"Scientific",q:"Boyle's Law states that pressure and volume are:",opts:["Directly proportional at constant temperature","Inversely proportional at constant temperature","Directly proportional at constant pressure","Inversely proportional at constant pressure"],ans:1,exp:"P1V1 = P2V2. Pressure and volume inversely proportional at constant temperature."},
+  {cat:"Scientific",q:"Absolute pressure equals:",opts:["Gauge pressure only","Atmospheric pressure only","Gauge pressure + atmospheric pressure","Gauge pressure − atmospheric pressure"],ans:2,exp:"Absolute pressure = gauge pressure + atmospheric pressure (101.325 kPa at sea level)."},
+  {cat:"Scientific",q:"Calculate Q if m=10kg, c=4.187 kJ/kg·K, ΔT=20°C",opts:["837.4 kJ","83.74 kJ","418.7 kJ","209.35 kJ"],ans:0,exp:"Q = 10 × 4.187 × 20 = 837.4 kJ."},
+  {cat:"Scientific",q:"What is dezincification and where is it a risk?",opts:["Iron leaching from steel in acidic water","Zinc leaching from brass in hard water areas","Copper oxidising in chlorinated water","Lead dissolving in soft water"],ans:1,exp:"Zinc leaches from brass leaving a porous copper structure. Use DZR fittings in hard water areas."},
+  {cat:"Scientific",q:"Which material property describes resistance to being pulled apart?",opts:["Compressive strength","Malleability","Tensile strength","Ductility"],ans:2,exp:"Tensile strength = resistance to being pulled apart. Compressive = crushed."},
+  {cat:"Scientific",q:"What is the typical flow/return temperature differential in an LPHW heating system?",opts:["10°C","40°C","20°C","30°C"],ans:2,exp:"20°C differential between flow and return in a Low Pressure Hot Water system."},
+  {cat:"Scientific",q:"Dynamic pressure compared to static pressure is always:",opts:["Higher","The same","Lower","Unpredictable"],ans:2,exp:"Dynamic pressure (water flowing) is always lower than static pressure (water stationary)."},
+  {cat:"Scientific",q:"If a substance has a relative density less than 1, it will:",opts:["Sink in water","Float in water","Dissolve in water","React with water"],ans:1,exp:"RD < 1 = floats. RD > 1 = sinks. Water is the reference point at RD = 1.0."},
+  {cat:"Scientific",q:"Charles's Law states that volume and temperature are:",opts:["Inversely proportional at constant pressure","Directly proportional at constant pressure","Inversely proportional at constant temperature","Independent of each other"],ans:1,exp:"Charles's Law: volume and temperature directly proportional at constant pressure."},
+  {cat:"Scientific",q:"What does sensible heat do?",opts:["Changes state without changing temperature","Changes temperature without changing state","Causes thermal expansion only","Increases pressure"],ans:1,exp:"Sensible heat causes a temperature change. It can be measured with a thermometer. No change of state."},
+  {cat:"Scientific",q:"What is gauge pressure?",opts:["Pressure measured from absolute zero","Pressure measured above atmospheric pressure","Pressure at the bottom of a tank","The same as absolute pressure"],ans:1,exp:"Gauge pressure is measured above atmospheric pressure. Absolute pressure = gauge + atmospheric."},
+  {cat:"Scientific",q:"Electrolytic corrosion occurs when:",opts:["Two identical metals contact in water","Two dissimilar metals contact in the presence of water","Copper oxidises in hard water","Zinc is added to brass"],ans:1,exp:"Electrolytic corrosion requires two dissimilar metals in contact with water present. One corrodes preferentially."},
+  {cat:"Scientific",q:"What is the density of water?",opts:["100 kg/m³","10 kg/m³","1000 kg/m³","500 kg/m³"],ans:2,exp:"1000 kg/m³ — or 1 kg per litre. Used in volume and relative density calculations."},
+  {cat:"Scientific",q:"The formula for thermal linear expansion is:",opts:["expansion = length × temperature","expansion = length × coefficient × temperature rise","expansion = coefficient ÷ temperature","expansion = length ÷ coefficient"],ans:1,exp:"Expansion = original length × coefficient of linear expansion × temperature rise."},
+  {cat:"Scientific",q:"Why is water used as the medium in LPHW heating systems?",opts:["It is cheap and widely available","It has a high specific heat capacity, storing and carrying large amounts of heat","It has low viscosity","It does not expand when heated"],ans:1,exp:"Water's high SHC (4.187 kJ/kg·K) means it stores and transports large amounts of heat efficiently."},
+  {cat:"Scientific",q:"Pressure acts in which direction in a liquid?",opts:["Downwards only","Upwards only","In the direction of flow","Equally in all directions (Pascal's Law)"],ans:3,exp:"Pascal's Law: pressure in a liquid acts equally in all directions."},
+  {cat:"Scientific",q:"A copper pipe 4m long rises 50°C. Coefficient = 0.000017/°C. How much does it expand?",opts:["3.4mm","0.34mm","34mm","0.034mm"],ans:0,exp:"4 × 0.000017 × 50 = 0.0034m = 3.4mm."},
+  {cat:"Scientific",q:"Ferrous metals differ from non-ferrous metals because:",opts:["They contain zinc","They contain iron and will rust","They are used only for fittings","They do not conduct electricity"],ans:1,exp:"Ferrous = contains iron, will rust. Non-ferrous = no iron (copper, brass, aluminium) — corrosion resistant."},
+  {cat:"Scientific",q:"Ductility describes a material that:",opts:["Can be compressed without cracking","Can be drawn into wire or bent without breaking","Returns to its original shape after deformation","Resists impact"],ans:1,exp:"Ductile = can be drawn into wire or bent without breaking. Copper is a key example."},
+  {cat:"Scientific",q:"Atmospheric pressure at sea level is approximately:",opts:["10.1 kPa","1013.25 kPa","101.325 kPa","1.01325 kPa"],ans:2,exp:"101.325 kPa at sea level. Used when converting between gauge and absolute pressure."},
+  {cat:"Scientific",q:"Static pressure in a water system is:",opts:["Pressure when water is flowing","Pressure when water is stationary","Always lower than dynamic pressure","Equal to dynamic pressure"],ans:1,exp:"Static pressure is when water is not moving. Dynamic pressure occurs during flow and is always lower."},
+  {cat:"Scientific",q:"Volume can be calculated from mass and density using:",opts:["Volume = mass × density","Volume = density ÷ mass","Volume = mass ÷ density","Volume = mass + density"],ans:2,exp:"Volume = mass ÷ density. With water at 1000 kg/m³, 500kg of water occupies 0.5m³."},
+
+  // ── PROCESSES & TECHNIQUES (25) ──────────────────────────────────
+  {cat:"Processes",q:"Which copper pipe grade is soft tempered, sold in coils, used for microbore?",opts:["R290","R250","R220","Grade X"],ans:2,exp:"R220 — fully annealed (soft), thicker wall. Used underground and for microbore heating."},
+  {cat:"Processes",q:"What is 'pipe gain' in copper pipe bending?",opts:["The amount added to a cut length","Extra pipe needed around a bend","The shortening effect of a bend — subtract from measured length","The depth of the bend former"],ans:2,exp:"Pipe gain = the apparent shortening. Subtract from measured length to get correct cut length."},
+  {cat:"Processes",q:"What is the maximum notch depth in a joist?",opts:["1/4 of joist depth","1/8 of joist depth","1/3 of joist depth","1/5 of joist depth"],ans:1,exp:"Maximum notch depth = 0.125 × joist depth (one eighth). Notches in top, near supports."},
+  {cat:"Processes",q:"Where in the span must drilled holes be positioned?",opts:["0.1 to 0.2 of span from support","0.25 to 0.4 of span from support","Middle third only","Anywhere along the neutral axis"],ans:1,exp:"Holes: 0.25 to 0.4 of span from support, in the middle third of joist depth."},
+  {cat:"Processes",q:"Should PTFE tape be applied to compression fittings?",opts:["Yes, on the male thread","Yes, on the olive","No — the olive does the sealing","Only on Type B fittings"],ans:2,exp:"Never use PTFE on compression fittings. The olive seals the joint when compressed."},
+  {cat:"Processes",q:"What colour is MDPE pipe used for gas service pipes underground?",opts:["Blue","Black","Yellow","Orange"],ans:2,exp:"Yellow MDPE = gas underground. Blue MDPE = cold water mains underground."},
+  {cat:"Processes",q:"Which plastic pipe has shape memory and returns to its original shape when heated?",opts:["uPVC","Polybutylene","PEX","MDPE"],ans:2,exp:"PEX has shape memory — returns to round shape when heated, useful for push-fit seating."},
+  {cat:"Processes",q:"What must be applied before soldering a capillary fitting?",opts:["PTFE tape","Boss white","Flux — to clean and prevent oxidation","Jointing compound"],ans:2,exp:"Flux cleans metal surfaces and prevents oxidation during heating, allowing solder to bond."},
+  {cat:"Processes",q:"A Type B compression fitting differs from Type A because:",opts:["It uses PTFE tape instead of an olive","The pipe end is shaped/flared before fitting — used underground","It is demountable with a disconnect tool","It requires no pipe modification"],ans:1,exp:"Type B (manipulative) — pipe end is flared. Used underground where fitting can't be removed later."},
+  {cat:"Processes",q:"What is the maximum hole diameter you can drill through a joist?",opts:["1/8 of joist depth","1/3 of joist depth","1/4 of joist depth","1/2 of joist depth"],ans:2,exp:"Max hole diameter = 0.25 × joist depth (one quarter). Minimum spacing = 3 × hole diameter."},
+  {cat:"Processes",q:"What is the purpose of flux in soldering?",opts:["It seals the joint","It cleans the metal and prevents oxidation during heating","It fills gaps in the fitting","It replaces solder in end-feed fittings"],ans:1,exp:"Flux cleans and de-oxidises the metal surfaces so solder flows and bonds correctly."},
+  {cat:"Processes",q:"What must be done with excess flux after soldering?",opts:["Leave it — it protects the joint","Wash off immediately with cold water","Clean off after jointing to prevent corrosion","Heat it off with the blowtorch"],ans:2,exp:"Excess flux must be cleaned off after jointing — it causes corrosion if left."},
+  {cat:"Processes",q:"What type of solder must be used on domestic water supply pipework?",opts:["Lead-based solder","Lead-free solder","Silver solder only","Any solder with flux core"],ans:1,exp:"Lead-free solder is mandatory on domestic water systems — lead contaminates the water supply."},
+  {cat:"Processes",q:"A solder ring (Yorkshire) fitting differs from an end-feed fitting because:",opts:["It uses no heat","The solder is pre-loaded inside the fitting","It requires flux on the outside only","It cannot be used on hot water"],ans:1,exp:"Solder ring (Yorkshire) has solder pre-loaded. End feed requires solder applied separately during jointing."},
+  {cat:"Processes",q:"Which zone of a joist is used for notches?",opts:["Bottom, near mid-span","Top, near supports (0.1 to 0.2 of span)","Bottom, near supports","Middle, anywhere"],ans:1,exp:"Notches: top of joist, within 0.1 to 0.2 of the span from each support."},
+  {cat:"Processes",q:"Push-fit fittings on plastic pipe require what additional component?",opts:["Flux","PTFE tape","Pipe insert to prevent collapse under compression","An olive"],ans:2,exp:"Pipe inserts must be used in plastic pipe with push-fit fittings to prevent the pipe collapsing under compression."},
+  {cat:"Processes",q:"PTFE tape on a threaded joint is wound in which direction?",opts:["Anti-clockwise from the end","Clockwise from the end — in the direction of the thread","It doesn't matter","Clockwise from the back"],ans:1,exp:"PTFE tape wound in the direction of the thread (clockwise from the male end). Applied to male thread only."},
+  {cat:"Processes",q:"uPVC pipe is suitable for which of the following?",opts:["Hot water supply","Central heating flow pipework","Cold water and waste/soil","Underfloor heating"],ans:2,exp:"uPVC = cold water, waste and soil. Max working temperature approx 60°C — not suitable for hot water."},
+  {cat:"Processes",q:"What does R250 copper pipe offer compared to R220?",opts:["Softer temper for bending in coils","Half-hard temper, most common above-ground plumbing and heating","Thinner walls for tight spaces","Harder temper, rarely used in UK"],ans:1,exp:"R250 — half-hard, most widely used grade for above-ground plumbing and heating."},
+  {cat:"Processes",q:"BSP stands for:",opts:["British Standard Pipe","British Standard Plumbing","British Specification Profile","Building Services Pipe"],ans:0,exp:"BSP = British Standard Pipe. This is the thread form used in UK plumbing for threaded joints."},
+  {cat:"Processes",q:"Polybutylene (PB) pipe is suitable for:",opts:["Underground gas only","Hot and cold water and heating pipework","Soil and waste only","Cold water mains only"],ans:1,exp:"Polybutylene — flexible, good temperature resistance. Used for hot and cold water and heating."},
+  {cat:"Processes",q:"Minimum spacing between drilled holes in a joist is:",opts:["2 × hole diameter","3 × hole diameter","5 × hole diameter","Equal to the hole diameter"],ans:1,exp:"Minimum spacing between holes = 3 × hole diameter."},
+  {cat:"Processes",q:"What standard covers copper tubes for water and gas in the UK?",opts:["BS EN 806","BS 7671","BS EN 1057","BS EN 12056"],ans:2,exp:"BS EN 1057 covers copper tubes — specifies dimensions and tolerances for R220, R250, R290 grades."},
+  {cat:"Processes",q:"Which pipe type is joined by butt fusion or electrofusion welding?",opts:["Copper","uPVC","PEX","MDPE"],ans:3,exp:"MDPE is joined by butt fusion or electrofusion welding, or mechanical compression fittings."},
+  {cat:"Processes",q:"For a 15mm copper pipe bent at 90°, the approximate pipe gain is:",opts:["2mm","4mm","10mm","6mm"],ans:1,exp:"For 15mm copper at 90°: pipe gain ≈ 4mm. For 22mm: ≈ 6mm. Always check textbook tables."},
+
+  // ── HEALTH & SAFETY (30) ──────────────────────────────────────────
+  {cat:"Health & Safety",q:"Under RIDDOR 2013, within how many days must a 3-day injury be reported?",opts:["7 days","10 days","21 days","15 days"],ans:3,exp:"15 days for 3-day injuries. Deaths and specified injuries must be reported immediately."},
+  {cat:"Health & Safety",q:"What is the maximum unsupported excavation depth?",opts:["0.5m","1.2m","2.0m","1.5m"],ans:1,exp:"1.2m maximum. Beyond that: batter sides (45°), bench, or shore up."},
+  {cat:"Health & Safety",q:"Which fire extinguisher is used on cooking oil fires?",opts:["CO₂","Dry powder","Foam","Wet chemical"],ans:3,exp:"Wet chemical only for Class F (cooking oil). Never use water or CO₂ on oil fires."},
+  {cat:"Health & Safety",q:"What does an HSE Prohibition Notice require?",opts:["21 days to comply","Work stops immediately until rectified","Verbal warning only","Pay a fine and continue"],ans:1,exp:"Prohibition Notice = immediate work stoppage. Improvement Notice gives minimum 21 days."},
+  {cat:"Health & Safety",q:"What is the minimum distance spoil must be kept from the edge of an excavation?",opts:["Depth of the trench","500mm","1 metre","2 metres"],ans:2,exp:"1 metre minimum — fixed rule, not related to trench depth."},
+  {cat:"Health & Safety",q:"What is the maximum working pressure for acetylene?",opts:["5 PSI","15 PSI","25 PSI","8 PSI"],ans:1,exp:"Never exceed 15 PSI with acetylene. Working pressure is 5–8 PSI."},
+  {cat:"Health & Safety",q:"What is the risk rating for Likelihood 4 × Consequence 4?",opts:["8 — Low","12 — Medium","16 — High","20 — High"],ans:2,exp:"4 × 4 = 16. Score 13–25 = High. Stop work / immediate action required."},
+  {cat:"Health & Safety",q:"Under COSHH, how many steps are in the assessment process?",opts:["5","6","8","10"],ans:2,exp:"8 steps: assess → precautions → prevent/control → ensure controls → monitor → health surveillance → emergency plans → inform/train."},
+  {cat:"Health & Safety",q:"Which asbestos type has the most dangerous fibres?",opts:["White (Chrysotile)","Brown (Amosite)","Blue (Crocidolite)","All are equally dangerous"],ans:2,exp:"Blue (Crocidolite) has the most dangerous fibres. Brown (Amosite) is most dangerous in board form."},
+  {cat:"Health & Safety",q:"What is the 4:1 rule for ladder use?",opts:["Ladder must extend 4m above platform","For every 4m up, 1m out at base (≈75°)","Maximum 4 rungs above tie point","4 people max per ladder"],ans:1,exp:"4:1 ratio = 75°. For every 4 units up, 1 unit out from the wall."},
+  {cat:"Health & Safety",q:"What is the legal status of an ACOP?",opts:["Fully mandatory","Advisory only","Not an offence to ignore, but evidence of guilt if prosecuted","Only applies to employers with 5+ staff"],ans:2,exp:"ACOPs: not an offence to ignore, but not following one is evidence of guilt if prosecuted."},
+  {cat:"Health & Safety",q:"For burns first aid, how long should you cool under cold running water?",opts:["2 minutes","5 minutes","10 minutes","20 minutes"],ans:2,exp:"10 minutes under cold running water. No cream, no ointment, do not burst blisters."},
+  {cat:"Health & Safety",q:"What does HASAWA 1974 Section 7 require of employees?",opts:["Provide PPE","Take reasonable care for themselves and others","Write risk assessments","Report all accidents"],ans:1,exp:"Section 7: employees must take reasonable care for themselves and others affected by their acts/omissions."},
+  {cat:"Health & Safety",q:"Under the Work at Height Regulations 2005, the hierarchy is:",opts:["Minimise → Prevent → Avoid","Avoid → Prevent → Minimise","Prevent → Minimise → Avoid","Minimise → Avoid → Prevent"],ans:1,exp:"Avoid working at height → if unavoidable, prevent a fall → if fall possible, minimise consequences."},
+  {cat:"Health & Safety",q:"What hearing protection is required above what noise level?",opts:["70 dB(A)","80 dB(A)","90 dB(A)","100 dB(A)"],ans:1,exp:"Hearing protection required above 80 dB(A). Upper exposure limit is 87 dB(A)."},
+  {cat:"Health & Safety",q:"Propane gas is heavier than air. What does this mean on site?",opts:["It rises and collects near ceilings","It pools in trenches and low areas — never use in trenches","It disperses safely outdoors","It is safer to use than MAPP gas indoors"],ans:1,exp:"Propane is heavier than air — pools in trenches and low areas. Never use propane in excavations."},
+  {cat:"Health & Safety",q:"What is the PASS technique for fire extinguisher use?",opts:["Pull, Aim high, Squeeze, Sweep","Pull, Aim at base, Squeeze, Sweep","Point, Aim, Spray, Stand back","Pull, Apply, Smother, Secure"],ans:1,exp:"PASS: Pull pin → Aim low at base of fire → Squeeze lever → Sweep side to side. Stand 3m back."},
+  {cat:"Health & Safety",q:"Which fire extinguisher can be used on both liquid (B) and gas (C) fires?",opts:["Water","Foam","Wet chemical","CO₂"],ans:3,exp:"CO₂ works on B (liquids), C (gases), and E (electrical). Dry powder also covers B, C and E."},
+  {cat:"Health & Safety",q:"What does a yellow triangle safety sign indicate?",opts:["Mandatory action","Safe condition","Warning / danger","Prohibition"],ans:2,exp:"Yellow triangle = warning/danger/caution. Blue circle = mandatory. Red circle/bar = prohibition."},
+  {cat:"Health & Safety",q:"Under Manual Handling Regulations 1992, the preferred approach is:",opts:["Always use a team lift","Avoid manual handling where possible; use kinetic technique if unavoidable","Use back belts at all times","No restrictions if the load is under 25kg"],ans:1,exp:"Avoid where possible. If unavoidable: kinetic technique (knees bent, back straight) and mechanical aids."},
+  {cat:"Health & Safety",q:"Asbestos is suspected in a pre-2000 building. What is the correct response?",opts:["Mark the area and continue carefully","Stop, withdraw, report, licensed contractor only","Remove a sample for testing yourself","Wet the area and continue work"],ans:1,exp:"STOP → WITHDRAW → REPORT → Licensed contractor only. Never disturb suspected asbestos."},
+  {cat:"Health & Safety",q:"The latency period for mesothelioma from asbestos exposure is:",opts:["5–10 years","10–20 years","30–40 years","1–5 years"],ans:2,exp:"Mesothelioma has a 30–40 year latency period. Fatal cancer caused by asbestos fibre inhalation."},
+  {cat:"Health & Safety",q:"LPG cylinders must NEVER be stored:",opts:["Upright","Outdoors","Below ground level","In a locked cage"],ans:2,exp:"LPG must never be stored below ground. Also never in boiler rooms. Upright, ventilated, secure."},
+  {cat:"Health & Safety",q:"An Improvement Notice from the HSE gives a minimum of how long to comply?",opts:["7 days","14 days","21 days","28 days"],ans:2,exp:"Minimum 21 days to comply with an Improvement Notice. Can be appealed."},
+  {cat:"Health & Safety",q:"What is the difference between a hazard and a risk?",opts:["They are the same thing","Hazard = anything that may cause harm; Risk = the chance of harm occurring + severity","Hazard = the injury; Risk = the cause","Risk is always higher than hazard"],ans:1,exp:"Hazard = anything that MAY cause harm. Risk = the CHANCE of harm occurring + its severity."},
+  {cat:"Health & Safety",q:"CPR compression ratio and rate is:",opts:["15:2 at 80/min","30:2 at 100–120/min","30:2 at 60/min","15:1 at 100/min"],ans:1,exp:"30 compressions to 2 rescue breaths, at 100–120 compressions per minute. Press 4–5cm depth."},
+  {cat:"Health & Safety",q:"What standard applies to safety footwear on site?",opts:["BS EN 166","EN 20345","BS EN 397","EN 388"],ans:1,exp:"EN 20345 — steel toecap and midsole mandatory on site."},
+  {cat:"Health & Safety",q:"What is the maximum indoor height ratio for a tower scaffold?",opts:["3× shortest base","3.5× shortest base","4× shortest base","5× shortest base"],ans:1,exp:"Indoor: 3.5× shortest base dimension. Outdoor: 3×. Tie to building if over 6.4m."},
+  {cat:"Health & Safety",q:"Oxygen cylinders for oxyacetylene must be stored at least how far from LPG/acetylene?",opts:["1m","2m","3m","5m"],ans:2,exp:"3m minimum separation — or behind a 30-minute fire wall. Never allow oil/grease near oxygen."},
+  {cat:"Health & Safety",q:"A Permit to Work differs from a Method Statement because:",opts:["A PTW is informal; a method statement is formal","A PTW is formal written authorisation for high-risk work, naming persons, time frame, and requiring written declaration on completion","A PTW is for all work; method statements only for hazardous work","They are the same document"],ans:1,exp:"PTW = formal written authorisation. Names persons, describes work, sets time frame. Written declaration required on completion before equipment reinstated."},
+
+  // ── CONSTRUCTION & COMMUNICATION (20) ───────────────────────────
+  {cat:"Construction",q:"Who is the client's on-site representative ensuring work meets agreed plans?",opts:["Site Supervisor","Trade Supervisor","Clerk of Works","Building Control Officer"],ans:2,exp:"Clerk of Works = client's on-site rep. Ensures contractors complete work to agreed plans and standards."},
+  {cat:"Construction",q:"When is a project notifiable to the HSE under CDM 2015?",opts:["Any project over 30 days","30+ days AND 20+ simultaneous workers, OR 500+ person-days","Any project with more than 5 workers","Projects over £100,000"],ans:1,exp:"Notifiable if: 30+ days AND 20+ simultaneous workers, OR exceeds 500 person-days."},
+  {cat:"Construction",q:"What is a Variation Order?",opts:["A daily site diary entry","Formal written instruction authorising a change to scope, signed by the client","A verbal agreement to change the work","An HSE enforcement notice"],ans:1,exp:"VO = formal written instruction for any scope change. Must be signed off by the client before work proceeds."},
+  {cat:"Construction",q:"What does a Quantity Surveyor (QS) do?",opts:["Inspects structural work on site","Controls costs, prepares bills of quantities, values variations","Issues planning permission","Manages material deliveries"],ans:1,exp:"QS controls costs, advises on financial budget, prepares bills of quantities, values variations."},
+  {cat:"Construction",q:"What risk score range requires immediate action / stopping work?",opts:["1–5","6–12","13–25","20–25 only"],ans:2,exp:"13–25 = High risk. Stop work, immediate action required. 6–12 = Medium. 1–5 = Low."},
+  {cat:"Construction",q:"The key principle of communication with any person is:",opts:["Always use written communication","Communication has only worked when it has been understood","Verbal is always better than written","Use diagrams wherever possible"],ans:1,exp:"The rule: communication has only worked when it has been understood. Method is secondary."},
+  {cat:"Construction",q:"What is the purpose of a Method Statement?",opts:["To record site accidents","A step-by-step safe system of work, produced after risk assessment","A financial record of materials used","A daily log of workers on site"],ans:1,exp:"Method Statement = step-by-step safe system of work. Produced after risk assessment. Required at tendering."},
+  {cat:"Construction",q:"What does ACAS do?",opts:["Issues HSE enforcement notices","Provides free impartial advice and mediates employment disputes","Sets building regulations","Certifies gas engineers"],ans:1,exp:"ACAS = Advisory, Conciliation and Arbitration Service. Free, impartial. Mediates between employer and employee."},
+  {cat:"Construction",q:"First fix plumbing refers to:",opts:["Installing appliances after decoration","Installation of pipework into joists and walls before plastering","Commissioning and testing","Snagging and handover"],ans:1,exp:"First fix = pipework installed before plastering. Second fix = appliances installed after decoration."},
+  {cat:"Construction",q:"A Gantt chart is used on site to:",opts:["Record accidents and near misses","Show the planned sequence, timing and duration of tasks","List materials required for each trade","Record labour costs"],ans:1,exp:"Gantt chart = work programme showing planned sequence, timing and duration. Used to coordinate trades and monitor progress."},
+  {cat:"Construction",q:"What is a snagging list?",opts:["A list of materials to be ordered","Defects identified at end of job, rectified before handover","A record of variation orders","A list of subcontractors on site"],ans:1,exp:"Snagging list = defects identified at end of job, rectified before handover to client."},
+  {cat:"Construction",q:"The Equality Act 2010 protects against discrimination based on:",opts:["Company policy only","Protected characteristics including age, gender, race, disability, religion","Length of employment","Job title"],ans:1,exp:"Equality Act 2010 covers 9 protected characteristics including age, gender, race, disability, sexual orientation, religion."},
+  {cat:"Construction",q:"What is the role of the Building Control Officer (BCO)?",opts:["Enforce H&S legislation","Check building regulations compliance at key stages on behalf of the local authority","Represent the client on site","Manage subcontractors"],ans:1,exp:"BCO = employed by local authority. Checks building regs compliance at key stages. Expected to visit site."},
+  {cat:"Construction",q:"Manufacturers' instructions have what legal status?",opts:["Fully mandatory — same as Acts","Advisory, but deviation can void warranty and breach regulations","No legal standing","Only mandatory for gas appliances"],ans:1,exp:"Advisory in themselves, but deviation can void warranty and may breach regulations that require compliance with manufacturer guidance."},
+  {cat:"Construction",q:"A Level 2 operative's authority on site is:",opts:["Can authorise any variation up to £500","Carry out work as instructed; report problems upward; cannot authorise variations","Can supervise other Level 2 operatives autonomously","Can sign off RAMS"],ans:1,exp:"Level 2: carry out work as instructed, report problems to supervisor, cannot authorise variations."},
+  {cat:"Construction",q:"What document authorises changes to the original scope of work?",opts:["Method Statement","Delivery Note","Variation Order","Site Policy"],ans:2,exp:"Variation Order — formal written instruction signed by the client. Required before any scope change begins."},
+  {cat:"Construction",q:"As-built drawings differ from working drawings because:",opts:["They are produced before construction starts","They record what was actually installed, not what was designed","They are for structural elements only","They replace the specification"],ans:1,exp:"As-built drawings = final record of what was actually installed. May differ from original design drawings."},
+  {cat:"Construction",q:"A formal quotation must always be:",opts:["Verbal to avoid disputes","In writing","Submitted within 48 hours","Countersigned by the HSE"],ans:1,exp:"Formal quotations must be in writing. Verbal agreements are not sufficient for formal quotations."},
+  {cat:"Construction",q:"The CDM 2015 H&S file:",opts:["Is destroyed on project completion","Stays with the building until demolition","Is kept by the principal contractor only","Is submitted to the HSE"],ans:1,exp:"The H&S file stays with the building for its entire life, until demolition."},
+  {cat:"Construction",q:"Risk = Likelihood × Consequence. Both are scored 1–5. What is the maximum possible risk score?",opts:["10","15","25","50"],ans:2,exp:"Maximum = 5 × 5 = 25. Scores 13–25 = High, 6–12 = Medium, 1–5 = Low."},
+];
+
+let activeFilter = 'All';
+let questions = [];
+let current = 0, score = 0, wrongCount = 0;
+let missed = [], missedSet = null;
+let answered = false;
+
+function setFilter(f) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  restart(false);
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function restart(missedOnly) {
+  if (missedOnly && missed.length > 0) {
+    questions = shuffle([...missed]);
+  } else {
+    const pool = activeFilter === 'All' ? ALL_QUESTIONS : ALL_QUESTIONS.filter(q => q.cat === activeFilter);
+    questions = shuffle([...pool]);
+  }
+  current = 0; score = 0; wrongCount = 0; missed = [];
+  answered = false;
+  document.getElementById('resultCard').classList.remove('show');
+  document.getElementById('quizArea').style.display = 'block';
+  document.getElementById('score').textContent = 0;
+  document.getElementById('wrong').textContent = 0;
+  document.getElementById('qTotal').textContent = questions.length;
+  loadQuestion();
+}
+
+function loadQuestion() {
+  answered = false;
+  const q = questions[current];
+  document.getElementById('categoryTag').textContent = q.cat;
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('qNum').textContent = current + 1;
+  document.getElementById('progressFill').style.width = ((current / questions.length) * 100) + '%';
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback'; fb.textContent = '';
+  document.getElementById('nextBtn').classList.remove('show');
+  const opts = document.getElementById('optionsContainer');
+  opts.innerHTML = '';
+  const keys = ['A','B','C','D'];
+  const shuffledOpts = q.opts.map((text, i) => ({ text, orig: i }));
+  shuffle(shuffledOpts);
+  shuffledOpts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="option-key">${keys[i]}</span>${opt.text}`;
+    btn.onclick = () => selectAnswer(opt.orig === q.ans, btn, shuffledOpts, q);
+    opts.appendChild(btn);
+  });
+}
+
+function selectAnswer(correct, btn, shuffledOpts, q) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.option').forEach((b, i) => {
+    b.disabled = true;
+    if (shuffledOpts[i].orig === q.ans) b.classList.add('correct');
+  });
+  const fb = document.getElementById('feedback');
+  if (correct) {
+    btn.classList.add('correct');
+    score++;
+    document.getElementById('score').textContent = score;
+    fb.className = 'feedback correct-fb show';
+    fb.textContent = '✓ ' + q.exp;
+  } else {
+    btn.classList.add('wrong');
+    wrongCount++;
+    document.getElementById('wrong').textContent = wrongCount;
+    missed.push(q);
+    fb.className = 'feedback wrong-fb show';
+    fb.textContent = '✗ ' + q.exp;
+  }
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) showResult();
+  else loadQuestion();
+}
+
+function showResult() {
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('progressFill').style.width = '100%';
+  const pct = Math.round((score / questions.length) * 100);
+  document.getElementById('finalScore').textContent = pct + '%';
+  document.getElementById('resultMessage').textContent = `${score} correct out of ${questions.length}`;
+  const rc = document.getElementById('resultCard');
+  rc.classList.add('show');
+  const mb = document.getElementById('missedBtn');
+  mb.style.display = missed.length > 0 ? 'inline-block' : 'none';
+  const bd = document.getElementById('breakdown');
+  if (missed.length === 0) {
+    bd.innerHTML = '<div class="breakdown-title">MISSED QUESTIONS</div><div style="color:var(--success);font-size:0.9rem;padding:12px 0;">Clean sheet — no missed questions.</div>';
+  } else {
+    let html = '<div class="breakdown-title">MISSED QUESTIONS — REVISE THESE</div>';
+    missed.forEach(q => {
+      html += `<div class="missed-item"><strong>[${q.cat}]</strong> ${q.q}<br><span style="color:var(--muted);font-size:0.8rem">${q.exp}</span></div>`;
+    });
+    bd.innerHTML = html;
+  }
+}
+
+restart(false);
+</script>
+</body>
+</html>
