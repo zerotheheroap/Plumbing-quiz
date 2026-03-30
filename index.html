@@ -4,344 +4,698 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>L2 Plumbing Quiz</title>
+<title>L2 Plumbing Revision</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;500&display=swap');
-:root{--bg:#0f0f0f;--surface:#181818;--border:#2a2a2a;--accent:#e8c547;--accent2:#4ec9b0;--danger:#f44747;--success:#4ec94e;--warning:#e89c47;--text:#d4d4d4;--muted:#666;--ok-bg:#1a2e1a;--bad-bg:#2e1a1a;--warn-bg:#2e241a}
+:root{--bg:#0f0f0f;--surface:#181818;--border:#2a2a2a;--accent:#e8c547;--accent2:#4ec9b0;--danger:#f44747;--success:#4ec94e;--warning:#e89c47;--text:#d4d4d4;--muted:#666;--ok-bg:#1a2e1a;--bad-bg:#2e1a1a;--warn-bg:#2e241a;--flag:#c084fc}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 16px}
-.wrap{width:100%;max-width:680px}
-.screen{display:none}.screen.active{display:block}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 60px}
+.wrap{width:100%;max-width:700px;padding:0 16px}
+nav{width:100%;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;display:flex;justify-content:center}
+.nav-inner{width:100%;max-width:700px;display:flex}
+.nav-btn{flex:1;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.07em;text-transform:uppercase;padding:12px 4px;background:transparent;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
+.nav-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.page-header{padding:20px 0 14px;border-bottom:1px solid var(--border);margin-bottom:18px}
 .title{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;color:var(--accent);letter-spacing:0.04em;text-transform:uppercase}
-.subtitle{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);margin-top:2px;letter-spacing:0.08em}
-header{width:100%;max-width:680px;border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:24px}
-
-/* STATS GRID */
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
-.stat-card{background:var(–surface);border:1px solid var(–border);border-radius:4px;padding:14px 16px}
-.stat-card .big{font-family:‘Barlow Condensed’,sans-serif;font-size:2rem;font-weight:700;color:var(–accent);line-height:1}
-.stat-card .lbl{font-family:‘DM Mono’,monospace;font-size:0.65rem;color:var(–muted);letter-spacing:0.08em;margin-top:4px}
-
-/* SECTION HEADERS */
-.sec-hd{font-family:‘DM Mono’,monospace;font-size:0.65rem;color:var(–muted);letter-spacing:0.1em;text-transform:uppercase;margin:20px 0 10px}
-
-/* FILTERS */
-.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.fbtn{font-family:‘DM Mono’,monospace;font-size:0.65rem;padding:4px 10px;border-radius:3px;border:1px solid var(–border);background:transparent;color:var(–muted);cursor:pointer;transition:all 0.15s;letter-spacing:0.06em}
-.fbtn.active{border-color:var(–accent);color:var(–accent);background:rgba(232,197,71,0.07)}
-
-/* BUTTONS */
+.subtitle{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted);margin-top:2px;letter-spacing:0.08em}
+.screen{display:none;padding-top:16px}.screen.active{display:block}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px 14px}
+.stat-card .big{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:700;color:var(--accent);line-height:1}
+.stat-card .big.streak{color:var(--warning)}
+.stat-card .lbl{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:0.08em;margin-top:3px}
+.sec-hd{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin:18px 0 8px}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.fbtn{font-family:'DM Mono',monospace;font-size:0.6rem;padding:4px 9px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;letter-spacing:0.06em}
+.fbtn.active{border-color:var(--accent);color:var(--accent);background:rgba(232,197,71,0.07)}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap}
-.btn{font-family:‘Barlow Condensed’,sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:10px 20px;border-radius:3px;border:1px solid var(–border);background:transparent;color:var(–text);cursor:pointer;transition:all 0.15s}
-.btn:hover:not(:disabled){background:var(–surface)}
+.btn{font-family:'Barlow Condensed',sans-serif;font-size:0.88rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:9px 16px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;transition:all 0.15s}
+.btn:hover:not(:disabled){background:var(--surface)}
 .btn:disabled{opacity:0.35;cursor:default}
-.btn.primary{border-color:var(–accent);color:var(–accent)}
-.btn.warn{border-color:var(–warning);color:var(–warning)}
-.btn.danger{border-color:var(–danger);color:var(–danger)}
-
-/* HISTORY */
-.hist-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px solid var(–border);font-size:0.85rem}
-.hist-item .pct{font-family:‘DM Mono’,monospace;font-size:0.8rem;color:var(–accent)}
-.hist-item .meta-s{color:var(–muted);font-size:0.75rem}
-
-/* WEAK SPOTS LIST */
-.weak-item{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:9px 0;border-top:1px solid var(–border);font-size:0.85rem;line-height:1.5}
-.weak-item .fails{font-family:‘DM Mono’,monospace;font-size:0.75rem;color:var(–danger);white-space:nowrap;margin-top:2px}
-
-/* QUIZ */
-.progress-track{width:100%;height:3px;background:var(–border);border-radius:2px;margin-bottom:20px;overflow:hidden}
-.progress-fill{height:100%;background:var(–accent);transition:width 0.3s;border-radius:2px}
-.meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.badge{font-family:‘DM Mono’,monospace;font-size:0.65rem;padding:3px 8px;border-radius:3px;background:var(–surface);color:var(–muted);border:1px solid var(–border)}
-.badge.cat{background:rgba(78,201,176,0.1);color:var(–accent2);border-color:rgba(78,201,176,0.2)}
-.badge.ws-badge{background:rgba(232,156,71,0.1);color:var(–warning);border-color:rgba(232,156,71,0.2)}
-.qtext{font-size:1rem;font-weight:500;line-height:1.6;color:#e8e8e8;margin-bottom:16px}
-.options{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
-.opt{background:transparent;border:1px solid var(–border);border-radius:3px;padding:11px 14px;color:var(–text);font-family:‘Barlow’,sans-serif;font-size:0.9rem;text-align:left;cursor:pointer;transition:all 0.15s;display:flex;align-items:flex-start;gap:10px;line-height:1.4}
-.opt:hover:not(:disabled){border-color:var(–accent);color:var(–accent);background:rgba(232,197,71,0.04)}
+.btn.primary{border-color:var(--accent);color:var(--accent)}
+.btn.warn{border-color:var(--warning);color:var(--warning)}
+.btn.danger{border-color:var(--danger);color:var(--danger)}
+.btn.flagc{border-color:var(--flag);color:var(--flag)}
+.btn.sm{font-size:0.75rem;padding:6px 12px}
+.list-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--border);font-size:0.82rem}
+.list-item .dim{color:var(--muted);font-size:0.72rem}
+.list-item .pct{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--accent)}
+.weak-item{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:8px 0;border-top:1px solid var(--border);font-size:0.82rem;line-height:1.5}
+.weak-item .fails{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--danger);white-space:nowrap;margin-top:2px}
+.empty-state{font-size:0.8rem;color:var(--muted);padding:6px 0}
+.cat-bar-row{padding:9px 0;border-top:1px solid var(--border)}
+.cat-bar-label{display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:5px}
+.cat-bar-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.cat-bar-fill{height:100%;border-radius:2px;transition:width 0.4s}
+.progress-track{width:100%;height:3px;background:var(--border);border-radius:2px;margin-bottom:14px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);transition:width 0.3s;border-radius:2px}
+.meta-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.badge{font-family:'DM Mono',monospace;font-size:0.6rem;padding:3px 7px;border-radius:3px;background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+.badge.cat{background:rgba(78,201,176,0.1);color:var(--accent2);border-color:rgba(78,201,176,0.2)}
+.timer-el{font-family:'DM Mono',monospace;font-size:0.72rem;padding:3px 9px;border-radius:3px;border:1px solid var(--border);color:var(--text);margin-left:auto}
+.timer-el.warn{color:var(--warning);border-color:var(--warning)}
+.timer-el.crit{color:var(--danger);border-color:var(--danger)}
+.qtext{font-size:0.98rem;font-weight:500;line-height:1.6;color:#e8e8e8;margin-bottom:12px}
+.options{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
+.opt{background:transparent;border:1px solid var(--border);border-radius:3px;padding:10px 13px;color:var(--text);font-family:'Barlow',sans-serif;font-size:0.88rem;text-align:left;cursor:pointer;transition:all 0.15s;display:flex;align-items:flex-start;gap:9px;line-height:1.4}
+.opt:hover:not(:disabled){border-color:var(--accent);color:var(--accent);background:rgba(232,197,71,0.04)}
 .opt:disabled{cursor:default}
-.opt.correct{border-color:var(–success);background:var(–ok-bg);color:var(–success)}
-.opt.wrong{border-color:var(–danger);background:var(–bad-bg);color:var(–danger)}
-.okey{font-family:‘DM Mono’,monospace;font-size:0.65rem;color:var(–muted);min-width:14px;margin-top:2px}
+.opt.correct{border-color:var(--success);background:var(--ok-bg);color:var(--success)}
+.opt.wrong{border-color:var(--danger);background:var(--bad-bg);color:var(--danger)}
+.okey{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);min-width:13px;margin-top:2px}
 .opt.correct .okey,.opt.wrong .okey{color:inherit;opacity:0.6}
-.fb{padding:12px 14px;border-radius:3px;font-size:0.85rem;line-height:1.6;display:none;margin-bottom:14px}
+.fb{padding:11px 13px;border-radius:3px;font-size:0.82rem;line-height:1.6;display:none;margin-bottom:10px}
 .fb.show{display:block}
-.fb.ok{background:var(–ok-bg);border-left:3px solid var(–success);color:#9fd49f}
-.fb.bad{background:var(–bad-bg);border-left:3px solid var(–danger);color:#d49f9f}
-.ws-banner{background:var(–warn-bg);border-left:3px solid var(–warning);color:#d4b07f;font-size:0.8rem;padding:10px 14px;border-radius:3px;margin-bottom:16px;line-height:1.5}
-
-/* RESULT */
-.result-big{font-family:‘Barlow Condensed’,sans-serif;font-size:5rem;font-weight:800;color:var(–accent);line-height:1;text-align:center}
-.result-sub{font-size:0.9rem;color:var(–muted);text-align:center;margin:6px 0 20px}
-.cleared-msg{background:var(–ok-bg);border-left:3px solid var(–success);color:#9fd49f;font-size:0.85rem;padding:10px 14px;border-radius:3px;margin-bottom:16px}
-.missed-item{padding:10px 0;border-top:1px solid var(–border);font-size:0.85rem;color:var(–muted);line-height:1.5}
-.missed-item strong{color:var(–text);font-weight:500}
-.empty-state{font-size:0.85rem;color:var(–muted);padding:8px 0}
+.fb.ok{background:var(--ok-bg);border-left:3px solid var(--success);color:#9fd49f}
+.fb.bad{background:var(--bad-bg);border-left:3px solid var(--danger);color:#d49f9f}
+.ws-banner{background:var(--warn-bg);border-left:3px solid var(--warning);color:#d4b07f;font-size:0.76rem;padding:9px 13px;border-radius:3px;margin-bottom:12px;line-height:1.5}
+.quiz-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.result-big{font-family:'Barlow Condensed',sans-serif;font-size:5rem;font-weight:800;color:var(--accent);line-height:1;text-align:center}
+.result-sub{font-size:0.88rem;color:var(--muted);text-align:center;margin:5px 0 18px}
+.cleared-msg{background:var(--ok-bg);border-left:3px solid var(--success);color:#9fd49f;font-size:0.8rem;padding:9px 13px;border-radius:3px;margin-bottom:12px}
+.missed-item{padding:9px 0;border-top:1px solid var(--border);font-size:0.8rem;color:var(--muted);line-height:1.5}
+.missed-item strong{color:var(--text);font-weight:500}
+.cs-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.cs-btn{font-family:'DM Mono',monospace;font-size:0.6rem;padding:4px 9px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s}
+.cs-btn.active{border-color:var(--accent2);color:var(--accent2);background:rgba(78,201,176,0.07)}
+.cs-unit{display:none}.cs-unit.active{display:block}
+.cs-section{margin-bottom:18px}
+.cs-section h3{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--accent);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.cs-item{font-size:0.8rem;line-height:1.65;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text)}
+.cs-item strong{color:var(--accent2);font-weight:500}
+.cs-formula{font-family:'DM Mono',monospace;font-size:0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:7px 11px;margin:5px 0;color:var(--accent);line-height:1.8}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.check-item input[type=checkbox]{margin-top:3px;accent-color:var(--accent);width:14px;height:14px;flex-shrink:0;cursor:pointer}
+.check-label{font-size:0.82rem;line-height:1.5}
+.check-label.done{text-decoration:line-through;color:var(--muted)}
+.check-cat{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);display:block;margin-top:2px}
+.check-progress{height:4px;background:var(--border);border-radius:2px;margin-bottom:5px;overflow:hidden}
+.check-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s}
 </style>
-
 </head>
 <body>
-<header>
-  <div class="title">L2 Plumbing — Quiz</div>
-  <div class="subtitle">ELECTRICAL · SCIENTIFIC · PROCESSES · H&S · CONSTRUCTION</div>
-</header>
+
+<nav>
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="showTab('home',this)">Home</button>
+    <button class="nav-btn" onclick="showTab('quiz',this)">Quiz</button>
+    <button class="nav-btn" onclick="showTab('cheat',this)">Notes</button>
+    <button class="nav-btn" onclick="showTab('revision',this)">Revision</button>
+    <button class="nav-btn" onclick="showTab('stats',this)">Stats</button>
+  </div>
+</nav>
 
 <div class="wrap">
+<div class="page-header">
+  <div class="title">L2 Plumbing</div>
+  <div class="subtitle">ELECTRICAL · SCIENTIFIC · PROCESSES · H&S · CONSTRUCTION</div>
+</div>
 
 <!-- HOME -->
 
-<div id="s-home" class="screen active">
+<div id="tab-home" class="screen active">
   <div class="stats-grid">
-    <div class="stat-card"><div class="big" id="h-total">0</div><div class="lbl">QUESTIONS ANSWERED</div></div>
+    <div class="stat-card"><div class="big" id="h-total">0</div><div class="lbl">ANSWERED</div></div>
+    <div class="stat-card"><div class="big streak" id="h-streak">0</div><div class="lbl">STREAK 🔥</div></div>
     <div class="stat-card"><div class="big" id="h-weak">0</div><div class="lbl">WEAK SPOTS</div></div>
-    <div class="stat-card"><div class="big" id="h-sessions">0</div><div class="lbl">SESSIONS</div></div>
     <div class="stat-card"><div class="big" id="h-avg">—</div><div class="lbl">AVG SCORE</div></div>
   </div>
-
-  <div class="sec-hd">Select topic filter</div>
-  <div class="filters" id="filters">
-    <button class="fbtn active" onclick="setFilter('All',this)">All</button>
-    <button class="fbtn" onclick="setFilter('Electrical',this)">Electrical</button>
-    <button class="fbtn" onclick="setFilter('Scientific',this)">Scientific</button>
-    <button class="fbtn" onclick="setFilter('Processes',this)">Processes</button>
-    <button class="fbtn" onclick="setFilter('Health & Safety',this)">H&S</button>
-    <button class="fbtn" onclick="setFilter('Construction',this)">Construction</button>
+  <div class="sec-hd">Quick start</div>
+  <div class="filters" id="hf">
+    <button class="fbtn active" onclick="setFilter('All',this,'hf')">All</button>
+    <button class="fbtn" onclick="setFilter('Electrical',this,'hf')">Electrical</button>
+    <button class="fbtn" onclick="setFilter('Scientific',this,'hf')">Scientific</button>
+    <button class="fbtn" onclick="setFilter('Processes',this,'hf')">Processes</button>
+    <button class="fbtn" onclick="setFilter('Health &amp; Safety',this,'hf')">H&amp;S</button>
+    <button class="fbtn" onclick="setFilter('Construction',this,'hf')">Construction</button>
   </div>
-  <div class="btn-row" style="margin-bottom:24px">
-    <button class="btn primary" onclick="startQuiz(false)">30 random questions</button>
-    <button class="btn warn" id="wsBtn" onclick="startQuiz(true)">⚡ Drill weak spots</button>
+  <div class="btn-row" style="margin-bottom:20px">
+    <button class="btn primary" onclick="startQuiz(false,false)">30 random</button>
+    <button class="btn warn" id="wsBtn" onclick="startQuiz(true,false)">⚡ Weak spots</button>
+    <button class="btn flagc" id="flagBtn" onclick="startQuiz(false,true)">⚑ Flagged</button>
   </div>
-
   <div class="sec-hd">Recent sessions</div>
-  <div id="hist-list"><div class="empty-state">No sessions yet.</div></div>
-
-  <div class="sec-hd" style="margin-top:24px">Weak spots — top 20 most failed</div>
-  <div id="weak-list"><div class="empty-state">None yet — complete some quizzes.</div></div>
-
-  <div class="btn-row" style="margin-top:24px">
-    <button class="btn danger" onclick="clearData()">Clear all data</button>
+  <div id="h-hist"><div class="empty-state">No sessions yet.</div></div>
+  <div class="sec-hd" style="margin-top:18px">Top weak spots</div>
+  <div id="h-wl"><div class="empty-state">None yet.</div></div>
+  <div class="btn-row" style="margin-top:20px">
+    <button class="btn danger sm" onclick="clearData()">Clear all data</button>
   </div>
 </div>
 
 <!-- QUIZ -->
 
-<div id="s-quiz" class="screen">
-  <div id="ws-banner" class="ws-banner" style="display:none"></div>
-  <div class="progress-track"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
-  <div class="meta-row">
-    <span class="badge cat" id="catTag"></span>
-    <span class="badge" id="qcount"></span>
-    <span class="badge">Score <strong id="scoreEl">0</strong></span>
-    <span class="badge">Wrong <strong id="wrongEl">0</strong></span>
+<div id="tab-quiz" class="screen">
+  <div id="qsetup">
+    <div class="sec-hd">Topic filter</div>
+    <div class="filters" id="qf">
+      <button class="fbtn active" onclick="setFilter('All',this,'qf')">All</button>
+      <button class="fbtn" onclick="setFilter('Electrical',this,'qf')">Electrical</button>
+      <button class="fbtn" onclick="setFilter('Scientific',this,'qf')">Scientific</button>
+      <button class="fbtn" onclick="setFilter('Processes',this,'qf')">Processes</button>
+      <button class="fbtn" onclick="setFilter('Health &amp; Safety',this,'qf')">H&amp;S</button>
+      <button class="fbtn" onclick="setFilter('Construction',this,'qf')">Construction</button>
+    </div>
+    <div class="sec-hd">Timer</div>
+    <div class="filters">
+      <button class="fbtn active" id="t-off" onclick="setTimer(0,this)">Off</button>
+      <button class="fbtn" id="t-20" onclick="setTimer(20,this)">20s</button>
+      <button class="fbtn" id="t-30" onclick="setTimer(30,this)">30s</button>
+    </div>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn primary" onclick="startQuiz(false,false)">30 random</button>
+      <button class="btn warn" id="wsBtn2" onclick="startQuiz(true,false)">⚡ Weak spots</button>
+      <button class="btn flagc" id="flagBtn2" onclick="startQuiz(false,true)">⚑ Flagged</button>
+    </div>
   </div>
-  <div class="qtext" id="qtext"></div>
-  <div class="options" id="opts"></div>
-  <div class="fb" id="fb"></div>
-  <button class="btn primary" id="nbtn" style="display:none" onclick="next()">Next →</button>
-</div>
-
-<!-- RESULT -->
-
-<div id="s-result" class="screen">
-  <div class="result-big" id="r-pct"></div>
-  <div class="result-sub" id="r-sub"></div>
-  <div id="cleared-banner" class="cleared-msg" style="display:none"></div>
-  <div class="btn-row" style="justify-content:center;margin-bottom:24px">
-    <button class="btn primary" onclick="goHome()">Home</button>
-    <button class="btn" onclick="startQuiz(false)">Another 30</button>
-    <button class="btn warn" id="r-wsBtn" onclick="startQuiz(true)">⚡ Drill weak spots</button>
+  <div id="qactive" style="display:none">
+    <div id="ws-banner" class="ws-banner" style="display:none"></div>
+    <div class="progress-track"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
+    <div class="meta-row">
+      <span class="badge cat" id="catTag"></span>
+      <span class="badge" id="qcount"></span>
+      <span class="badge">✓ <strong id="scoreEl">0</strong></span>
+      <span class="badge">✗ <strong id="wrongEl">0</strong></span>
+      <span class="timer-el" id="timerEl" style="display:none">20s</span>
+    </div>
+    <div class="qtext" id="qtext"></div>
+    <div class="options" id="opts"></div>
+    <div class="fb" id="fb"></div>
+    <div class="quiz-actions">
+      <button class="btn primary sm" id="nbtn" style="display:none" onclick="nextQ()">Next →</button>
+      <button class="btn flagc sm" id="flagQBtn" style="display:none" onclick="flagCurrentQ()">⚑ Flag this</button>
+    </div>
   </div>
-  <div class="sec-hd">Missed this session</div>
-  <div id="r-missed"></div>
+  <div id="qresult" style="display:none">
+    <div class="result-big" id="r-pct"></div>
+    <div class="result-sub" id="r-sub"></div>
+    <div id="cleared-banner" class="cleared-msg" style="display:none"></div>
+    <div class="btn-row" style="justify-content:center;margin-bottom:18px">
+      <button class="btn primary" onclick="endQuiz()">Done</button>
+      <button class="btn" onclick="startQuiz(false,false)">Another 30</button>
+      <button class="btn warn" id="r-wsBtn" onclick="startQuiz(true,false)">⚡ Weak spots</button>
+    </div>
+    <div class="sec-hd">Missed this session</div>
+    <div id="r-missed"></div>
+  </div>
 </div>
 
+<!-- NOTES -->
+
+<div id="tab-cheat" class="screen">
+  <div class="cs-nav">
+    <button class="cs-btn active" onclick="showCS('cs-elec',this)">Electrical</button>
+    <button class="cs-btn" onclick="showCS('cs-sci',this)">Scientific</button>
+    <button class="cs-btn" onclick="showCS('cs-proc',this)">Processes</button>
+    <button class="cs-btn" onclick="showCS('cs-hs',this)">H&amp;S</button>
+    <button class="cs-btn" onclick="showCS('cs-con',this)">Construction</button>
+  </div>
+
+  <div id="cs-elec" class="cs-unit active">
+    <div class="cs-section"><h3>Ohm's Law &amp; Power</h3>
+      <div class="cs-formula">V = I × R | I = V ÷ R | R = V ÷ I
+P = V × I | P = I² × R | P = V² ÷ R</div>
+    </div>
+    <div class="cs-section"><h3>Circuits</h3>
+      <div class="cs-item"><strong>Series:</strong> Current same throughout. Voltage splits. R = R1 + R2 + R3</div>
+      <div class="cs-item"><strong>Parallel:</strong> Voltage same across all branches. Current splits. 1/R = 1/R1 + 1/R2 + 1/R3. Total R always less than smallest branch.</div>
+    </div>
+    <div class="cs-section"><h3>Shock Protection</h3>
+      <div class="cs-item"><strong>Class I:</strong> Earthed metalwork — relies on earth conductor</div>
+      <div class="cs-item"><strong>Class II:</strong> Double insulated — no earth required. Symbol: square within a square</div>
+      <div class="cs-item"><strong>Class III:</strong> Operates at SELV — max 50V AC / 120V DC ripple-free</div>
+      <div class="cs-item"><strong>SELV:</strong> Separated Extra Low Voltage — isolated from earth and other circuits</div>
+      <div class="cs-item"><strong>PELV:</strong> Protected Extra Low Voltage — connected to earth</div>
+      <div class="cs-item"><strong>RCD:</strong> 30mA personal protection | 100mA or 300mA fire and equipment</div>
+    </div>
+    <div class="cs-section"><h3>Earthing Arrangements</h3>
+      <div class="cs-item"><strong>TN-S:</strong> Separate neutral and earth throughout</div>
+      <div class="cs-item"><strong>TN-C-S (PME):</strong> Combined PEN splits at cut-out — most common UK domestic</div>
+      <div class="cs-item"><strong>TT:</strong> Earth electrode at premises — no metallic return path</div>
+    </div>
+    <div class="cs-section"><h3>Protective Devices</h3>
+      <div class="cs-item"><strong>Fuse:</strong> Single use — melts to break circuit</div>
+      <div class="cs-item"><strong>MCB:</strong> Resettable — trips on overload or short circuit</div>
+      <div class="cs-item"><strong>RCBO:</strong> Combined RCD + MCB</div>
+      <div class="cs-item"><strong>Voltage drop:</strong> 3% lighting / 5% power</div>
+    </div>
+    <div class="cs-section"><h3>Safe Isolation (8 steps)</h3>
+      <div class="cs-item">1. Identify circuit | 2. Confirm convenient to isolate | 3. Select approved VI; test on proving unit | 4. Verify circuit LIVE | 5. Isolate at CU | 6. Verify circuit DEAD; recheck on live supply | 7. Lock off; keep fuse in pocket | 8. Post warning notice</div>
+      <div class="cs-item"><strong>GS38:</strong> Approved test leads required throughout</div>
+    </div>
+    <div class="cs-section"><h3>Cable Colours</h3>
+      <div class="cs-item">Post-2004: Brown = Line | Blue = Neutral | Green/Yellow = Earth</div>
+      <div class="cs-item">Old: Red = Live | Black = Neutral | Green = Earth</div>
+    </div>
+    <div class="cs-section"><h3>Site Voltages</h3>
+      <div class="cs-item">25V Violet — confined lighting | 110V Yellow — tools | 230V Blue — offices via RCD | 400V Red — fixed 3-phase</div>
+    </div>
+  </div>
+
+  <div id="cs-sci" class="cs-unit">
+    <div class="cs-section"><h3>Heat Energy</h3>
+      <div class="cs-formula">Q = m × c × ΔT
+c (water) = 4.187 kJ/kg·K</div>
+      <div class="cs-item"><strong>Sensible heat:</strong> Causes temperature change — no change of state</div>
+      <div class="cs-item"><strong>Latent heat:</strong> Causes change of state — no temperature change during transition</div>
+    </div>
+    <div class="cs-section"><h3>Pressure &amp; Head</h3>
+      <div class="cs-formula">Pressure = Force ÷ Area (Pa = N/m²)
+1m head = 9.81 kPa (~10 kPa practical)
+Absolute = gauge + 101.325 kPa</div>
+      <div class="cs-item"><strong>Static:</strong> Water not moving | <strong>Dynamic:</strong> Flowing — always lower than static</div>
+      <div class="cs-item"><strong>Gauge pressure:</strong> Measured above atmospheric</div>
+      <div class="cs-item"><strong>Pascal's Law:</strong> Pressure acts equally in all directions in a liquid</div>
+    </div>
+    <div class="cs-section"><h3>Gas Laws</h3>
+      <div class="cs-formula">Boyle's: P1V1 = P2V2 (constant temp)
+Charles's: V1/T1 = V2/T2 (constant pressure)</div>
+      <div class="cs-item">Gases: compressible, expand to fill container | Liquids: incompressible</div>
+    </div>
+    <div class="cs-section"><h3>Thermal Expansion</h3>
+      <div class="cs-formula">Expansion = length × coefficient × temp rise
+Copper: 0.000017/°C</div>
+    </div>
+    <div class="cs-section"><h3>Material Properties</h3>
+      <div class="cs-item"><strong>Ferrous:</strong> Contains iron — rusts | <strong>Non-ferrous:</strong> No iron — corrosion resistant</div>
+      <div class="cs-item"><strong>Ductile:</strong> Drawn into wire/bent without breaking (copper)</div>
+      <div class="cs-item"><strong>Malleable:</strong> Shaped by hammering (lead)</div>
+      <div class="cs-item"><strong>Tensile strength:</strong> Resistance to being pulled apart</div>
+      <div class="cs-item"><strong>Compressive:</strong> Resistance to being crushed</div>
+      <div class="cs-item"><strong>Electrolytic corrosion:</strong> Two dissimilar metals + water</div>
+      <div class="cs-item"><strong>Dezincification:</strong> Zinc leaches from brass in hard water — use DZR fittings</div>
+    </div>
+    <div class="cs-section"><h3>LPHW &amp; Density</h3>
+      <div class="cs-item"><strong>LPHW differential:</strong> 20°C flow/return typical</div>
+      <div class="cs-item"><strong>Water:</strong> 1000 kg/m³ | RD 1.0 | Volume = mass ÷ density</div>
+      <div class="cs-item">RD &gt; 1 sinks | RD &lt; 1 floats</div>
+    </div>
+  </div>
+
+  <div id="cs-proc" class="cs-unit">
+    <div class="cs-section"><h3>Copper Pipe Grades (BS EN 1057)</h3>
+      <div class="cs-item"><strong>R220:</strong> Soft/annealed, thick wall — coils, microbore, underground</div>
+      <div class="cs-item"><strong>R250:</strong> Half-hard — most common above-ground plumbing and heating</div>
+      <div class="cs-item"><strong>R290:</strong> Hard temper, thin wall — rarely used in UK</div>
+    </div>
+    <div class="cs-section"><h3>Pipe Bending</h3>
+      <div class="cs-item"><strong>Pipe gain:</strong> Subtract from measured length to get correct cut length</div>
+      <div class="cs-item">15mm 90° ≈ 4mm gain | 22mm 90° ≈ 6mm gain</div>
+    </div>
+    <div class="cs-section"><h3>Jointing</h3>
+      <div class="cs-item"><strong>Type A compression:</strong> Olive seals — no PTFE, no pipe mod</div>
+      <div class="cs-item"><strong>Type B compression:</strong> Pipe end flared — underground use</div>
+      <div class="cs-item"><strong>End feed:</strong> Solder applied separately | <strong>Solder ring:</strong> Pre-loaded solder</div>
+      <div class="cs-item"><strong>Flux:</strong> Cleans + prevents oxidation. Clean excess off after — causes corrosion.</div>
+      <div class="cs-item"><strong>Lead-free solder</strong> mandatory for domestic water</div>
+      <div class="cs-item"><strong>Push-fit:</strong> Pipe inserts required in plastic pipe</div>
+      <div class="cs-item"><strong>BSP thread:</strong> PTFE on male thread only, wound in direction of thread</div>
+    </div>
+    <div class="cs-section"><h3>Joist Notching &amp; Drilling</h3>
+      <div class="cs-item"><strong>Notches:</strong> Top, 0.1–0.2 of span from support. Max depth = 1/8 joist depth</div>
+      <div class="cs-item"><strong>Holes:</strong> Middle third, 0.25–0.4 of span. Max dia = 1/4 depth. Min spacing = 3 × dia</div>
+    </div>
+    <div class="cs-section"><h3>Plastic Pipes</h3>
+      <div class="cs-item"><strong>uPVC:</strong> Cold water/waste/soil — max ~60°C, NOT hot water</div>
+      <div class="cs-item"><strong>PEX:</strong> Flexible, shape memory, underfloor heating, hot &amp; cold</div>
+      <div class="cs-item"><strong>Polybutylene (PB):</strong> Flexible, hot &amp; cold, heating</div>
+      <div class="cs-item"><strong>MDPE Blue:</strong> Cold water mains underground</div>
+      <div class="cs-item"><strong>MDPE Yellow:</strong> Gas underground — butt fusion, electrofusion or compression</div>
+    </div>
+  </div>
+
+  <div id="cs-hs" class="cs-unit">
+    <div class="cs-section"><h3>Key Legislation</h3>
+      <div class="cs-item"><strong>HASAWA 1974:</strong> S.2 safe systems. S.3 protect non-employees. S.7 employees take reasonable care. S.8 no horseplay.</div>
+      <div class="cs-item"><strong>RIDDOR 2013:</strong> 3-day injuries within 15 days. Deaths immediately.</div>
+      <div class="cs-item"><strong>COSHH 2002:</strong> 8 steps. Check data sheet before use.</div>
+      <div class="cs-item"><strong>Work at Height 2005:</strong> Avoid → Prevent → Minimise</div>
+      <div class="cs-item"><strong>CDM 2015:</strong> H&amp;S file stays with building until demolition.</div>
+      <div class="cs-item">Acts = Mandatory | ACOPs = evidence of guilt if prosecuted | Guidance = advisory</div>
+    </div>
+    <div class="cs-section"><h3>Risk Assessment</h3>
+      <div class="cs-item">1. Identify hazards | 2. Who harmed &amp; how | 3. Evaluate &amp; decide precautions | 4. Record &amp; implement | 5. Review &amp; update</div>
+      <div class="cs-formula">Risk = Likelihood × Consequence (1–5 each, max 25)
+1–5 Low | 6–12 Medium | 13–25 High — stop work</div>
+    </div>
+    <div class="cs-section"><h3>Fire Extinguishers</h3>
+      <div class="cs-item">Water: A | Foam: A+B | Dry Powder: A B C E | CO₂: B C E | Wet Chemical: F only</div>
+      <div class="cs-item"><strong>PASS:</strong> Pull → Aim base → Squeeze → Sweep. 3m back.</div>
+    </div>
+    <div class="cs-section"><h3>PPE Standards</h3>
+      <div class="cs-item">Hard hat BS EN 397 | Footwear EN 20345 | Eye EN 166/172 | Mechanical gloves EN 388 | Thermal EN 407 | Chemical EN 374 | Hearing BS EN 352 (&gt;80 dB(A))</div>
+    </div>
+    <div class="cs-section"><h3>Excavations</h3>
+      <div class="cs-item">Max unsupported: <strong>1.2m</strong>. Spoil min <strong>1m</strong> from edge (fixed). NO propane in trenches.</div>
+    </div>
+    <div class="cs-section"><h3>Working at Height</h3>
+      <div class="cs-item"><strong>Ladders:</strong> 75° / 4:1. Extend 1m above. Tie if &gt;3m.</div>
+      <div class="cs-item"><strong>Tower:</strong> Indoor 3.5× base. Outdoor 3×. Tie &gt;6.4m. Never move with people on.</div>
+    </div>
+    <div class="cs-section"><h3>Hazardous Materials</h3>
+      <div class="cs-item"><strong>Asbestos:</strong> STOP → WITHDRAW → REPORT → Licensed contractor. Pre-2000 buildings.</div>
+      <div class="cs-item">Diseases: Asbestosis | Pleural Disease | Mesothelioma (30–40yr) | Lung Cancer</div>
+      <div class="cs-item"><strong>LPG:</strong> Upright, ventilated, outdoors/cage. NEVER below ground or boiler rooms. 3m from O₂.</div>
+      <div class="cs-item"><strong>Acetylene:</strong> Max 15 PSI. Work 5–8 PSI. Flashback arresters on BOTH lines.</div>
+      <div class="cs-item"><strong>Oxygen:</strong> Black cylinder, right-hand thread. No oil/grease. 3m from LPG.</div>
+    </div>
+    <div class="cs-section"><h3>First Aid</h3>
+      <div class="cs-item"><strong>CPR:</strong> 30:2 at 100–120/min. 4–5cm depth.</div>
+      <div class="cs-item"><strong>Burns:</strong> 10 min cold water. No cream. Don't burst blisters.</div>
+      <div class="cs-item"><strong>Electric shock:</strong> Never touch if in contact. Isolate first.</div>
+    </div>
+  </div>
+
+  <div id="cs-con" class="cs-unit">
+    <div class="cs-section"><h3>Key Roles</h3>
+      <div class="cs-item"><strong>Client:</strong> Commissions work, signs off VOs</div>
+      <div class="cs-item"><strong>Architect:</strong> Designs, produces drawings</div>
+      <div class="cs-item"><strong>QS:</strong> Controls costs, bills of quantities, values variations</div>
+      <div class="cs-item"><strong>Clerk of Works:</strong> Client's on-site rep — work to agreed plans</div>
+      <div class="cs-item"><strong>BCO:</strong> Local authority — building regs compliance at key stages</div>
+    </div>
+    <div class="cs-section"><h3>CDM 2015</h3>
+      <div class="cs-item">Notifiable: 30+ days AND 20+ simultaneous workers, OR 500+ person-days</div>
+      <div class="cs-item">H&amp;S file stays with building until demolition</div>
+    </div>
+    <div class="cs-section"><h3>Key Documents</h3>
+      <div class="cs-item"><strong>RAMS:</strong> Operatives must sign before work begins</div>
+      <div class="cs-item"><strong>Variation Order:</strong> Formal written, client signs BEFORE work proceeds</div>
+      <div class="cs-item"><strong>Delivery Note:</strong> No pricing — supplier, date, qty, description, order ref only</div>
+      <div class="cs-item"><strong>Gantt chart:</strong> Work programme — sequence, timing, duration</div>
+      <div class="cs-item"><strong>Snagging list:</strong> Defects at completion, rectified before handover</div>
+      <div class="cs-item"><strong>As-built drawings:</strong> Final record of what was actually installed</div>
+    </div>
+    <div class="cs-section"><h3>Legislation Status</h3>
+      <div class="cs-item"><strong>BS standards:</strong> Advisory — enforceability comes from legislation referencing them</div>
+      <div class="cs-item"><strong>Equality Act 2010:</strong> 9 protected characteristics</div>
+      <div class="cs-item"><strong>FOIA 2000:</strong> Info from public bodies | <strong>DPA 2018:</strong> Personal data</div>
+    </div>
+    <div class="cs-section"><h3>Communication &amp; Authority</h3>
+      <div class="cs-item">Communication has only worked when it has been understood</div>
+      <div class="cs-item">Formal quotations MUST be in writing</div>
+      <div class="cs-item"><strong>ACAS:</strong> Free impartial employment mediation</div>
+      <div class="cs-item"><strong>Level 2:</strong> Carry out work as instructed. Cannot authorise variations.</div>
+    </div>
+  </div>
 </div>
+
+<!-- REVISION -->
+
+<div id="tab-revision" class="screen">
+  <div class="sec-hd">Flagged revision topics</div>
+  <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);margin-bottom:4px">
+    <span>Progress</span><span id="check-pct">0%</span>
+  </div>
+  <div class="check-progress"><div class="check-progress-fill" id="check-fill" style="width:0%"></div></div>
+  <div id="check-list"></div>
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn danger sm" onclick="resetChecklist()">Reset progress</button>
+  </div>
+  <div class="sec-hd" style="margin-top:22px">Flagged questions (⚑)</div>
+  <div id="flag-list"><div class="empty-state">No flagged questions yet.</div></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn flagc sm" id="drillFlagBtn" onclick="startQuiz(false,true)">⚑ Drill flagged</button>
+    <button class="btn danger sm" onclick="clearFlags()">Clear flags</button>
+  </div>
+</div>
+
+<!-- STATS -->
+
+<div id="tab-stats" class="screen">
+  <div class="sec-hd">Performance by category</div>
+  <div id="cat-stats"></div>
+  <div class="sec-hd" style="margin-top:20px">All sessions</div>
+  <div id="all-hist"><div class="empty-state">No sessions yet.</div></div>
+  <div class="sec-hd" style="margin-top:20px">Full weak spots list</div>
+  <div id="full-weak"><div class="empty-state">None yet.</div></div>
+</div>
+
+</div><!-- /wrap -->
 
 <script>
-const STORE='plumbing_quiz_v3';
-const WEAK_SIZE=20;
-const WEAK_PASS_NEEDED=2;
-const SESSION_LIMIT=50;
+const STORE='plumbing_v4';
+const WEAK_SIZE=20,WEAK_PASS=2;
 
 function loadData(){try{return JSON.parse(localStorage.getItem(STORE))||newData();}catch(e){return newData();}}
-function newData(){return{totalAnswered:0,sessions:[],fails:{}};}
+function newData(){return{totalAnswered:0,sessions:[],fails:{},catStats:{},streak:0,flagged:[],checks:{}};}
 function saveData(d){try{localStorage.setItem(STORE,JSON.stringify(d));}catch(e){}}
 
-const Q=[
-{c:"Electrical",q:"What is the formula for power using voltage and current?",o:["P = V ÷ I","P = V × I","P = I ÷ V","P = V + I"],a:1,e:"P = V × I. Power (watts) = voltage × current."},
-{c:"Electrical",q:"In a parallel circuit, what is the same across all branches?",o:["Current","Resistance","Voltage","Power"],a:2,e:"Voltage is the same across all parallel branches. Current splits."},
-{c:"Electrical",q:"Class II appliance — what does it rely on for safety?",o:["Earth conductor","Double insulation, no earth required","SELV supply","RCD protection"],a:1,e:"Class II = double insulated. No earth required. Symbol: square within a square."},
-{c:"Electrical",q:"Standard RCD personal protection trip current?",o:["10mA","100mA","30mA","300mA"],a:2,e:"30mA personal protection. 100mA and 300mA = fire and equipment protection."},
-{c:"Electrical",q:"When do you prove the test instrument during safe isolation?",o:["Before and after testing the dead circuit","Only before","Only after","At start of day"],a:0,e:"Prove tester BEFORE and AFTER testing the dead circuit. Sandwich the dead test."},
-{c:"Electrical",q:"Most common UK domestic earthing arrangement?",o:["TN-S","TT","TN-C-S (PME)","IT"],a:2,e:"TN-C-S (PME). Combined PEN conductor splits at the cut-out."},
-{c:"Electrical",q:"Voltage drop limit for a power circuit?",o:["3%","5%","10%","2%"],a:1,e:"5% for power, 3% for lighting — textbook confirmed."},
-{c:"Electrical",q:"Which wiring system is fire resistant, used in extreme environments?",o:["SWA","Flat twin and earth","MICC (Pyro)","Conduit"],a:2,e:"MICC (Mineral Insulated Copper Clad / Pyro) — fire resistant."},
-{c:"Electrical",q:"SELV stands for?",o:["Safe Electrical Low Voltage","Separated Extra Low Voltage","Standard Extra Low Voltage","Shielded Earth Low Voltage"],a:1,e:"Separated Extra Low Voltage — max 50V AC / 120V DC. Isolated from earth."},
-{c:"Electrical",q:"Series circuit: 4Ω + 6Ω + 10Ω. Total resistance?",o:["2Ω","20Ω","2.4Ω","5Ω"],a:1,e:"Series: R = R1 + R2 + R3 = 4 + 6 + 10 = 20Ω."},
-{c:"Electrical",q:"Post-2004 Line (Live) conductor colour?",o:["Red","Black","Brown","Blue"],a:2,e:"Post-2004: Brown = Line, Blue = Neutral, Green/Yellow = Earth."},
-{c:"Electrical",q:"RCBO combines which two devices?",o:["Fuse and MCB","RCD and MCB","RCD and fuse","MCB and surge protector"],a:1,e:"RCBO = RCD + MCB. Protects against earth fault AND overload."},
-{c:"Electrical",q:"In a series circuit, what is the same throughout?",o:["Voltage","Resistance","Current","Power"],a:2,e:"Current is the same throughout a series circuit. Voltage splits."},
-{c:"Electrical",q:"Formula for resistance (Ohm's Law)?",o:["R = V × I","R = I ÷ V","R = V ÷ I","R = V + I"],a:2,e:"R = V ÷ I."},
-{c:"Electrical",q:"TT earthing differs from TN-C-S because?",o:["Combined PEN conductor","Earth electrode at premises, no metallic return path","Splits neutral at substation","Commercial use only"],a:1,e:"TT uses earth electrode at premises. No metallic return path."},
-{c:"Electrical",q:"What does a fuse do that an MCB cannot?",o:["Reset automatically","Protect against earth faults","Melt to break circuit — single use","Detect current imbalance"],a:2,e:"Fuse melts — single use. MCB is resettable."},
-{c:"Electrical",q:"PELV vs SELV — key difference?",o:["PELV connected to earth; SELV isolated from earth","Same thing","PELV for lighting only","PELV uses DC only"],a:0,e:"PELV = Protected Extra Low Voltage — connected to earth. SELV = Separated — isolated from earth."},
-{c:"Electrical",q:"Current drawn by a 2300W appliance on 230V?",o:["0.1A","23A","10A","100A"],a:2,e:"I = P ÷ V = 2300 ÷ 230 = 10A."},
-{c:"Electrical",q:"Standard site voltage for portable tools?",o:["25V","230V","110V","400V"],a:2,e:"110V (yellow) for site portable tools."},
-{c:"Electrical",q:"Purpose of equipotential bonding?",o:["Increases current flow","Connects metalwork to prevent voltage differences","Protects against overload","Reduces circuit resistance"],a:1,e:"Bonds metalwork to prevent dangerous voltage differences."},
-{c:"Electrical",q:"Which cable is used underground or for mechanical protection?",o:["Flat twin and earth","MICC","SWA (Steel Wire Armoured)","Conduit only"],a:2,e:"SWA — Steel Wire Armoured."},
-{c:"Electrical",q:"Old cable colour for Neutral (pre-2004)?",o:["Red","Green","Blue","Black"],a:3,e:"Old: Red = Live, Black = Neutral, Green = Earth."},
-{c:"Electrical",q:"Parallel circuit: 6Ω, 12Ω, 4Ω. Total resistance?",o:["22Ω","2Ω","4Ω","0.5Ω"],a:1,e:"1/R = 1/6 + 1/12 + 1/4 = 6/12 = 0.5. R = 2Ω."},
-{c:"Electrical",q:"Total parallel resistance is always?",o:["Greater than largest branch","Equal to smallest branch","Less than smallest branch","Average of all branches"],a:2,e:"Always less than the smallest individual branch resistance."},
-{c:"Electrical",q:"GS38 requires the use of?",o:["Earthed metalwork","Approved test leads during electrical testing","Circuit isolation before work","RCDs on all circuits"],a:1,e:"GS38 = approved, insulated, fused test leads for electrical testing."},
-{c:"Electrical",q:"Power of a 230V appliance drawing 5A?",o:["920W","46W","1150W","235W"],a:2,e:"P = V × I = 230 × 5 = 1150W."},
-{c:"Electrical",q:"Class III maximum operating voltage?",o:["25V AC","110V AC","50V AC / 120V DC ripple-free","12V DC only"],a:2,e:"Class III = SELV — max 50V AC or 120V DC ripple-free."},
-{c:"Electrical",q:"Step immediately after switching off at the CU in safe isolation?",o:["Test the circuit is dead","Prove tester on a live source","Lock off and fit warning notice","Identify the circuit"],a:2,e:"Lock off and fit warning notice before any testing."},
-{c:"Electrical",q:"MCB trips on?",o:["Earth leakage only","Overload or short circuit","Voltage drop","Neutral fault"],a:1,e:"MCB trips on overload or short circuit. Earth leakage = RCD."},
-{c:"Electrical",q:"Resistance in a metallic conductor increases when?",o:["Cross-sectional area increases","Length decreases","Temperature increases","Voltage increases"],a:2,e:"Resistance increases with temperature and length; decreases with larger cross-section."},
-{c:"Scientific",q:"Specific heat capacity of water?",o:["4.5 kJ/kg·K","4.187 kJ/kg·K","3.9 kJ/kg·K","4.0 kJ/kg·K"],a:1,e:"4.187 kJ/kg·K — textbook confirmed."},
-{c:"Scientific",q:"Latent heat causes?",o:["Temperature rise","Change of state with no temperature change","Thermal expansion","Increased pressure"],a:1,e:"Latent heat changes state with no temperature change during transition."},
-{c:"Scientific",q:"1 metre head of water = how much pressure?",o:["1 kPa","9.81 kPa","100 kPa","0.981 kPa"],a:1,e:"1m head = 9.81 kPa. ~10 kPa in practice."},
-{c:"Scientific",q:"Boyle's Law — pressure and volume are?",o:["Directly proportional at constant temperature","Inversely proportional at constant temperature","Directly proportional at constant pressure","Inversely proportional at constant pressure"],a:1,e:"P1V1 = P2V2. Inversely proportional at constant temperature."},
-{c:"Scientific",q:"Absolute pressure =?",o:["Gauge pressure only","Atmospheric only","Gauge + atmospheric","Gauge − atmospheric"],a:2,e:"Absolute = gauge + atmospheric (101.325 kPa at sea level)."},
-{c:"Scientific",q:"Q = ? if m=10kg, c=4.187, ΔT=20°C",o:["837.4 kJ","83.74 kJ","418.7 kJ","209.35 kJ"],a:0,e:"Q = 10 × 4.187 × 20 = 837.4 kJ."},
-{c:"Scientific",q:"Dezincification — what is it?",o:["Iron leaching from steel","Zinc leaching from brass in hard water areas","Copper oxidising in chlorinated water","Lead dissolving in soft water"],a:1,e:"Zinc leaches from brass leaving porous structure. Use DZR fittings in hard water areas."},
-{c:"Scientific",q:"Tensile strength describes?",o:["Resistance to crushing","Resistance to hammering","Resistance to being pulled apart","Ability to be drawn into wire"],a:2,e:"Tensile strength = resistance to being pulled apart."},
-{c:"Scientific",q:"Typical flow/return differential in LPHW?",o:["10°C","40°C","20°C","30°C"],a:2,e:"20°C differential between flow and return."},
-{c:"Scientific",q:"Dynamic pressure vs static pressure?",o:["Higher","The same","Lower","Unpredictable"],a:2,e:"Dynamic (flowing) always lower than static (stationary)."},
-{c:"Scientific",q:"Relative density less than 1 means?",o:["Sinks","Floats","Dissolves","Reacts with water"],a:1,e:"RD < 1 = floats. RD > 1 = sinks. Water = 1.0."},
-{c:"Scientific",q:"Charles's Law — volume and temperature are?",o:["Inversely proportional at constant pressure","Directly proportional at constant pressure","Inversely proportional at constant temperature","Independent"],a:1,e:"Directly proportional at constant pressure."},
-{c:"Scientific",q:"Sensible heat does what?",o:["Changes state without changing temperature","Changes temperature without changing state","Causes thermal expansion only","Increases pressure"],a:1,e:"Sensible heat causes temperature change. No change of state."},
-{c:"Scientific",q:"Gauge pressure is?",o:["Pressure from absolute zero","Pressure above atmospheric","Pressure at tank bottom","Same as absolute pressure"],a:1,e:"Gauge pressure is measured above atmospheric."},
-{c:"Scientific",q:"Electrolytic corrosion requires?",o:["Two identical metals in water","Two dissimilar metals in contact with water present","Copper in hard water","Zinc added to brass"],a:1,e:"Two dissimilar metals + water. One metal corrodes preferentially."},
-{c:"Scientific",q:"Density of water?",o:["100 kg/m³","10 kg/m³","1000 kg/m³","500 kg/m³"],a:2,e:"1000 kg/m³ = 1 kg per litre."},
-{c:"Scientific",q:"Formula for thermal linear expansion?",o:["length × temperature","length × coefficient × temperature rise","coefficient ÷ temperature","length ÷ coefficient"],a:1,e:"Expansion = original length × coefficient × temperature rise."},
-{c:"Scientific",q:"Why is water used in LPHW heating?",o:["It's cheap","High SHC — stores and carries large amounts of heat","Low viscosity","Doesn't expand when heated"],a:1,e:"High SHC (4.187 kJ/kg·K) means it stores and transports heat efficiently."},
-{c:"Scientific",q:"Pascal's Law — pressure in a liquid acts?",o:["Downwards only","Upwards only","In direction of flow","Equally in all directions"],a:3,e:"Pascal's Law: pressure acts equally in all directions."},
-{c:"Scientific",q:"Copper pipe 4m, temp rise 50°C, coefficient 0.000017/°C. Expansion?",o:["3.4mm","0.34mm","34mm","0.034mm"],a:0,e:"4 × 0.000017 × 50 = 0.0034m = 3.4mm."},
-{c:"Scientific",q:"Ferrous metals differ from non-ferrous because?",o:["Contain zinc","Contain iron and will rust","Used only for fittings","Don't conduct electricity"],a:1,e:"Ferrous = contains iron, rusts. Non-ferrous (copper, brass, aluminium) = no iron."},
-{c:"Scientific",q:"Ductile material means?",o:["Can be compressed without cracking","Can be drawn into wire or bent without breaking","Returns to original shape","Resists impact"],a:1,e:"Ductile = drawn into wire or bent without breaking. Copper is key example."},
-{c:"Scientific",q:"Atmospheric pressure at sea level?",o:["10.1 kPa","1013.25 kPa","101.325 kPa","1.01325 kPa"],a:2,e:"101.325 kPa at sea level."},
-{c:"Scientific",q:"Volume = ?",o:["mass × density","density ÷ mass","mass ÷ density","mass + density"],a:2,e:"Volume = mass ÷ density."},
-{c:"Processes",q:"R220 copper pipe — characteristics?",o:["Hard temper, thin wall","Half-hard, most common","Soft temper, thick wall, coils, microbore","Hard temper, rarely used"],a:2,e:"R220 — fully annealed (soft), thicker wall. Underground and microbore."},
-{c:"Processes",q:"Pipe gain — what does it mean?",o:["Add to cut length","Extra pipe at joints","Subtract from measured length to get correct cut length","Depth of bend former"],a:2,e:"Pipe gain = apparent shortening through a bend. Subtract from measured length."},
-{c:"Processes",q:"Maximum notch depth in a joist?",o:["1/4 depth","1/8 depth","1/3 depth","1/5 depth"],a:1,e:"Max notch = 0.125 × joist depth (one eighth). Top, near supports."},
-{c:"Processes",q:"Joist hole position in the span?",o:["0.1–0.2 from support","0.25–0.4 from support","Middle third only","Anywhere on neutral axis"],a:1,e:"Holes: 0.25–0.4 of span from support, middle third of joist depth."},
-{c:"Processes",q:"PTFE tape on compression fittings?",o:["Yes, male thread","Yes, on olive","No — olive does the sealing","Only Type B"],a:2,e:"Never PTFE on compression. The olive seals when compressed."},
-{c:"Processes",q:"Yellow MDPE underground pipe is for?",o:["Cold water mains","Drainage","Gas service pipes","Heating"],a:2,e:"Yellow MDPE = gas. Blue = cold water mains."},
-{c:"Processes",q:"Which plastic pipe has shape memory?",o:["uPVC","Polybutylene","PEX","MDPE"],a:2,e:"PEX returns to round shape when heated — useful for push-fit."},
-{c:"Processes",q:"What must be applied before soldering a capillary fitting?",o:["PTFE tape","Boss white","Flux","Jointing compound"],a:2,e:"Flux cleans and prevents oxidation so solder bonds correctly."},
-{c:"Processes",q:"Type B compression fitting vs Type A?",o:["Uses PTFE not olive","Pipe end flared — used underground","Demountable with tool","No pipe modification"],a:1,e:"Type B (manipulative) — pipe end flared. Used underground where fitting can't be removed."},
-{c:"Processes",q:"Maximum hole diameter in a joist?",o:["1/8 depth","1/3 depth","1/4 depth","1/2 depth"],a:2,e:"Max hole = 0.25 × joist depth. Min spacing = 3 × hole diameter."},
-{c:"Processes",q:"Purpose of flux in soldering?",o:["Seals the joint","Cleans metal and prevents oxidation","Fills gaps in fitting","Replaces solder in end-feed"],a:1,e:"Flux de-oxidises metal so solder flows and bonds."},
-{c:"Processes",q:"Excess flux after soldering?",o:["Leave it","Wash off immediately","Clean off after jointing to prevent corrosion","Heat it off"],a:2,e:"Clean off excess flux after jointing — causes corrosion if left."},
-{c:"Processes",q:"Solder on domestic water supply must be?",o:["Lead-based","Lead-free","Silver only","Flux-core only"],a:1,e:"Lead-free mandatory — lead contaminates water supply."},
-{c:"Processes",q:"Solder ring fitting vs end-feed?",o:["Uses no heat","Solder pre-loaded inside fitting","Flux on outside only","Cannot be used on hot water"],a:1,e:"Solder ring (Yorkshire) = solder pre-loaded. End feed = solder applied during jointing."},
-{c:"Processes",q:"Notch zone in a joist?",o:["Bottom, mid-span","Top, 0.1–0.2 of span from supports","Bottom, near supports","Middle, anywhere"],a:1,e:"Notches: top of joist, within 0.1–0.2 of span from each support."},
-{c:"Processes",q:"Plastic pipe with push-fit fittings requires?",o:["Flux","PTFE tape","Pipe insert to prevent collapse","An olive"],a:2,e:"Pipe inserts used in plastic pipe to prevent collapse under compression."},
-{c:"Processes",q:"PTFE tape wound in which direction?",o:["Anti-clockwise from end","Clockwise from end — direction of thread","Doesn't matter","Clockwise from back"],a:1,e:"Clockwise from male end, direction of thread. Male thread only."},
-{c:"Processes",q:"uPVC pipe is suitable for?",o:["Hot water supply","Central heating flow","Cold water and waste/soil","Underfloor heating"],a:2,e:"uPVC = cold water, waste and soil. Max ~60°C — not for hot water."},
-{c:"Processes",q:"R250 copper pipe?",o:["Soft, sold in coils","Half-hard, most common above-ground","Thinner walls, tight spaces","Hard temper, rarely used"],a:1,e:"R250 — half-hard, most widely used above-ground plumbing and heating."},
-{c:"Processes",q:"BSP stands for?",o:["British Standard Pipe","British Standard Plumbing","British Specification Profile","Building Services Pipe"],a:0,e:"BSP = British Standard Pipe. Thread form used in UK plumbing."},
-{c:"Processes",q:"Minimum spacing between drilled holes in a joist?",o:["2 × hole diameter","3 × hole diameter","5 × hole diameter","Equal to hole diameter"],a:1,e:"Min spacing = 3 × hole diameter."},
-{c:"Processes",q:"BS EN 1057 covers?",o:["Plastic pipe","Electrical wiring","Copper tubes — dimensions and tolerances","Soil and waste systems"],a:2,e:"BS EN 1057 — copper tubes for water and gas, R220/R250/R290 grades."},
-{c:"Processes",q:"MDPE is joined by?",o:["Capillary soldering","Compression only","Butt fusion, electrofusion, or mechanical compression","Push-fit only"],a:2,e:"MDPE: butt fusion, electrofusion welding, or mechanical compression."},
-{c:"Processes",q:"15mm copper at 90° bend — approximate pipe gain?",o:["2mm","4mm","10mm","6mm"],a:1,e:"15mm copper at 90°: pipe gain ≈ 4mm. 22mm ≈ 6mm."},
-{c:"Health & Safety",q:"RIDDOR 3-day injury — reporting timeframe?",o:["7 days","10 days","21 days","15 days"],a:3,e:"15 days for 3-day injuries. Deaths/specified injuries reported immediately."},
-{c:"Health & Safety",q:"Maximum unsupported excavation depth?",o:["0.5m","1.2m","2.0m","1.5m"],a:1,e:"1.2m maximum. Beyond that: batter, bench, or shore up."},
-{c:"Health & Safety",q:"Fire extinguisher for cooking oil fires?",o:["CO₂","Dry powder","Foam","Wet chemical"],a:3,e:"Wet chemical only for Class F. Never water or CO₂ on oil."},
-{c:"Health & Safety",q:"HSE Prohibition Notice means?",o:["21 days to comply","Work stops immediately","Verbal warning only","Pay fine and continue"],a:1,e:"Prohibition Notice = immediate work stoppage."},
-{c:"Health & Safety",q:"Minimum distance spoil from excavation edge?",o:["Depth of trench","500mm","1 metre","2 metres"],a:2,e:"1 metre minimum — fixed, not related to trench depth."},
-{c:"Health & Safety",q:"Maximum working pressure for acetylene?",o:["5 PSI","15 PSI","25 PSI","8 PSI"],a:1,e:"Never exceed 15 PSI. Working pressure 5–8 PSI."},
-{c:"Health & Safety",q:"Risk rating: Likelihood 4 × Consequence 4?",o:["8 — Low","12 — Medium","16 — High","20 — High"],a:2,e:"4 × 4 = 16. Score 13–25 = High. Stop work immediately."},
-{c:"Health & Safety",q:"COSHH assessment — how many steps?",o:["5","6","8","10"],a:2,e:"8 steps: assess → precautions → prevent/control → ensure controls → monitor → health surveillance → emergency → inform/train."},
-{c:"Health & Safety",q:"Which asbestos type has the most dangerous fibres?",o:["White (Chrysotile)","Brown (Amosite)","Blue (Crocidolite)","All equal"],a:2,e:"Blue (Crocidolite) most dangerous fibres. Brown (Amosite) most dangerous in board form."},
-{c:"Health & Safety",q:"Ladder 4:1 rule means?",o:["Extend 4m above platform","For every 4m up, 1m out at base (≈75°)","Max 4 rungs above tie","4 people max"],a:1,e:"4:1 = 75°. 4 units up, 1 unit out."},
-{c:"Health & Safety",q:"Legal status of an ACOP?",o:["Fully mandatory","Advisory only","Not an offence to ignore, but evidence of guilt if prosecuted","5+ staff only"],a:2,e:"Not an offence to ignore, but not following one is evidence of guilt if prosecuted."},
-{c:"Health & Safety",q:"Burns first aid — how long under cold running water?",o:["2 minutes","5 minutes","10 minutes","20 minutes"],a:2,e:"10 minutes. No cream, no ointment, don't burst blisters."},
-{c:"Health & Safety",q:"HASAWA 1974 Section 7 requires employees to?",o:["Provide PPE","Take reasonable care for themselves and others","Write risk assessments","Report all accidents"],a:1,e:"Section 7: employees must take reasonable care for themselves and others."},
-{c:"Health & Safety",q:"Work at Height Regs 2005 hierarchy?",o:["Minimise → Prevent → Avoid","Avoid → Prevent → Minimise","Prevent → Minimise → Avoid","Minimise → Avoid → Prevent"],a:1,e:"Avoid → Prevent → Minimise."},
-{c:"Health & Safety",q:"Hearing protection required above?",o:["70 dB(A)","80 dB(A)","90 dB(A)","100 dB(A)"],a:1,e:"Required above 80 dB(A). Upper limit 87 dB(A)."},
-{c:"Health & Safety",q:"Propane heavier than air means?",o:["Rises to ceilings","Pools in trenches — never use in excavations","Disperses safely outdoors","Safer than MAPP indoors"],a:1,e:"Propane pools in low areas. Never use in excavations."},
-{c:"Health & Safety",q:"PASS technique for fire extinguishers?",o:["Pull, Aim high, Squeeze, Sweep","Pull, Aim at base, Squeeze, Sweep","Point, Aim, Spray, Stand back","Pull, Apply, Smother, Secure"],a:1,e:"Pull → Aim at base → Squeeze → Sweep. Stand 3m back."},
-{c:"Health & Safety",q:"Which extinguisher covers liquid (B) and gas (C) fires?",o:["Water","Foam","Wet chemical","CO₂"],a:3,e:"CO₂ covers B, C and E. Dry powder also covers B, C and E."},
-{c:"Health & Safety",q:"Yellow triangle safety sign means?",o:["Mandatory action","Safe condition","Warning / danger","Prohibition"],a:2,e:"Yellow triangle = warning/danger. Blue circle = mandatory. Red = prohibition."},
-{c:"Health & Safety",q:"Manual Handling Regulations — preferred approach?",o:["Always team lift","Avoid where possible; kinetic technique if unavoidable","Use back belts always","No restrictions under 25kg"],a:1,e:"Avoid where possible. Kinetic technique and mechanical aids if unavoidable."},
-{c:"Health & Safety",q:"Asbestos suspected in pre-2000 building?",o:["Mark area and continue","Stop, withdraw, report, licensed contractor only","Remove sample yourself","Wet area and continue"],a:1,e:"STOP → WITHDRAW → REPORT → Licensed contractor only."},
-{c:"Health & Safety",q:"Mesothelioma latency period?",o:["5–10 years","10–20 years","30–40 years","1–5 years"],a:2,e:"30–40 year latency. Fatal cancer from asbestos fibre inhalation."},
-{c:"Health & Safety",q:"LPG cylinders must NEVER be stored?",o:["Upright","Outdoors","Below ground level","In locked cage"],a:2,e:"Never below ground. Never in boiler rooms. Upright, ventilated, secure."},
-{c:"Health & Safety",q:"HSE Improvement Notice — minimum time to comply?",o:["7 days","14 days","21 days","28 days"],a:2,e:"Minimum 21 days. Can be appealed."},
-{c:"Health & Safety",q:"Hazard vs Risk?",o:["Same thing","Hazard = anything that may cause harm; Risk = chance of harm + severity","Hazard = injury; Risk = cause","Risk always higher than hazard"],a:1,e:"Hazard = anything that MAY cause harm. Risk = CHANCE + severity."},
-{c:"Health & Safety",q:"CPR compression ratio and rate?",o:["15:2 at 80/min","30:2 at 100–120/min","30:2 at 60/min","15:1 at 100/min"],a:1,e:"30:2 at 100–120/min. Press 4–5cm depth."},
-{c:"Health & Safety",q:"Safety footwear standard?",o:["BS EN 166","EN 20345","BS EN 397","EN 388"],a:1,e:"EN 20345 — steel toecap and midsole mandatory on site."},
-{c:"Health & Safety",q:"Maximum indoor tower scaffold height ratio?",o:["3× shortest base","3.5× shortest base","4× shortest base","5× shortest base"],a:1,e:"Indoor: 3.5× shortest base. Outdoor: 3×."},
-{c:"Health & Safety",q:"Oxygen stored at least how far from LPG?",o:["1m","2m","3m","5m"],a:2,e:"3m minimum or behind 30-minute fire wall. No oil or grease near oxygen."},
-{c:"Health & Safety",q:"Permit to Work vs Method Statement?",o:["PTW informal; MS formal","PTW = formal written authorisation for high-risk work, names persons, time frame, written declaration on completion","PTW for all work; MS for hazardous","They are the same"],a:1,e:"PTW = formal written authorisation. Names persons, time frame. Written declaration required on completion."},
-{c:"Construction",q:"Client's on-site representative?",o:["Site Supervisor","Trade Supervisor","Clerk of Works","Building Control Officer"],a:2,e:"Clerk of Works = client's on-site rep. Ensures work meets agreed plans and standards."},
-{c:"Construction",q:"Project notifiable to HSE under CDM 2015 when?",o:["Any project over 30 days","30+ days AND 20+ simultaneous workers, OR 500+ person-days","More than 5 workers","Over £100,000"],a:1,e:"Notifiable: 30+ days AND 20+ simultaneous workers, OR 500+ person-days."},
-{c:"Construction",q:"Purpose of a Variation Order?",o:["Daily site diary","Formal written instruction authorising scope change, signed by client","Verbal agreement to change work","HSE notice"],a:1,e:"VO = formal written instruction for scope change. Client signs before work proceeds."},
-{c:"Construction",q:"Quantity Surveyor role?",o:["Inspects structural work","Controls costs, bills of quantities, values variations","Issues planning permission","Manages deliveries"],a:1,e:"QS: controls costs, bills of quantities, values variations."},
-{c:"Construction",q:"Risk score requiring immediate action?",o:["1–5","6–12","13–25","20–25 only"],a:2,e:"13–25 = High. Stop work, immediate action."},
-{c:"Construction",q:"Key principle of all communication?",o:["Always use written","Communication has only worked when it has been understood","Verbal always better","Use diagrams where possible"],a:1,e:"Communication has only worked when it has been understood."},
-{c:"Construction",q:"Purpose of a Method Statement?",o:["Record accidents","Step-by-step safe system of work, produced after risk assessment","Financial record","Daily log"],a:1,e:"Method Statement = step-by-step safe system of work. Required at tendering."},
-{c:"Construction",q:"ACAS role?",o:["Issues HSE notices","Free impartial advice and mediates employment disputes","Sets building regulations","Certifies gas engineers"],a:1,e:"ACAS = Advisory, Conciliation and Arbitration Service. Free employment mediation."},
-{c:"Construction",q:"First fix plumbing is?",o:["Installing appliances after decoration","Pipework into joists and walls before plastering","Commissioning and testing","Snagging"],a:1,e:"First fix = pipework before plastering. Second fix = appliances after decoration."},
-{c:"Construction",q:"A Gantt chart is used to?",o:["Record accidents","Show planned sequence, timing and duration of tasks","List materials","Record labour costs"],a:1,e:"Gantt chart = work programme. Coordinates trades and monitors progress."},
-{c:"Construction",q:"A snagging list is?",o:["Materials to order","Defects identified at end of job, rectified before handover","Record of VOs","List of subcontractors"],a:1,e:"Snagging = defects at completion, rectified before handover."},
-{c:"Construction",q:"Equality Act 2010 protects against discrimination based on?",o:["Company policy","Protected characteristics including age, gender, race, disability, religion","Length of employment","Job title"],a:1,e:"9 protected characteristics including age, gender, race, disability, sexual orientation, religion."},
-{c:"Construction",q:"Building Control Officer role?",o:["Enforce H&S law","Check building regs compliance at key stages for local authority","Represent client on site","Manage subcontractors"],a:1,e:"BCO = local authority. Checks building regs compliance at key stages."},
-{c:"Construction",q:"Legal status of manufacturers' instructions?",o:["Mandatory like Acts","Advisory, but deviation can void warranty and breach regulations","No legal standing","Only mandatory for gas"],a:1,e:"Advisory, but deviation can void warranty and may breach regulations."},
-{c:"Construction",q:"Level 2 operative's site authority?",o:["Authorise VOs up to £500","Carry out work as instructed; report problems; cannot authorise variations","Supervise Level 2 autonomously","Sign off RAMS"],a:1,e:"Level 2: carry out work as instructed, report problems, cannot authorise variations."},
-{c:"Construction",q:"As-built drawings differ from working drawings because?",o:["Produced before construction","Record what was actually installed","Structural only","Replace the specification"],a:1,e:"As-built = final record of what was actually installed."},
-{c:"Construction",q:"Formal quotations must be?",o:["Verbal","In writing","Within 48 hours","Countersigned by HSE"],a:1,e:"Formal quotations must be in writing."},
-{c:"Construction",q:"The CDM 2015 H&S file?",o:["Destroyed on completion","Stays with the building until demolition","Kept by principal contractor","Submitted to HSE"],a:1,e:"H&S file stays with the building until demolition."},
-{c:"Construction",q:"Maximum possible risk score (both scored 1–5)?",o:["10","15","25","50"],a:2,e:"5 × 5 = 25. 13–25 = High, 6–12 = Medium, 1–5 = Low."}
+const CHECKS=[
+  {id:'c1',cat:'Electrical',text:'Class I / II / III appliance definitions — SELV and PELV'},
+  {id:'c2',cat:'Electrical',text:'Safe isolation — full 8-step sequence, steps 2 and 4 especially'},
+  {id:'c3',cat:'Electrical',text:'Oxyacetylene thread directions — acetylene left-hand, oxygen right-hand'},
+  {id:'c4',cat:'Electrical',text:'Short circuit — definition and consequence'},
+  {id:'c5',cat:'H&S',text:'Improvement Notice — 21 day timeframe (not 15)'},
+  {id:'c6',cat:'Scientific',text:'LPHW flow/return differential — 20°C'},
+  {id:'c7',cat:'Scientific',text:'Dezincification vs electrolytic corrosion — keep separate'},
+  {id:'c8',cat:'Processes',text:'Purpose of flux in soldering'},
+  {id:'c9',cat:'Processes',text:'Copper pipe grades — R220/R250/R290 (not X/Y/Z)'},
+  {id:'c10',cat:'Processes',text:'Joist drilling — zone 0.25–0.4 of span, min spacing 3 × dia'},
+  {id:'c11',cat:'Processes',text:'BS EN 1057 — copper tube standard'},
+  {id:'c12',cat:'H&S',text:'RIDDOR full name — Reporting of Injuries, Diseases and Dangerous Occurrences Regulations'},
+  {id:'c13',cat:'H&S',text:'Asbestos — STOP → WITHDRAW → REPORT → Licensed contractor'},
+  {id:'c14',cat:'H&S',text:'Excavation spoil distance — 1m fixed, not depth-dependent'},
+  {id:'c15',cat:'H&S',text:'Risk assessment step 4 — Record findings AND implement (both)'},
+  {id:'c16',cat:'Construction',text:'Clerk of Works represents the CLIENT on site (not the architect)'},
+  {id:'c17',cat:'Construction',text:'Variation Orders — written, client-signed BEFORE work starts'},
+  {id:'c18',cat:'Construction',text:'Delivery notes contain NO pricing'},
+  {id:'c19',cat:'Construction',text:'Medium risk (6–12) — do not stop work, take immediate action to mitigate'},
+  {id:'c20',cat:'Construction',text:'Key BS/EN standard numbers across all units — learn these'},
 ];
 
-let activeFilter='All',qs=[],cur=0,sc=0,wr=0,sessionMissed=[],answered=false,isWeakSpots=false;
-let wsConsecCorrect={};
+const Q=[
+{c:"Electrical",q:"What is the formula for power using voltage and current?",o:["P = V ÷ I","P = V × I","P = I ÷ V","P = V + I"],a:1,e:"P = V × I."},
+{c:"Electrical",q:"In a parallel circuit, what is the same across all branches?",o:["Current","Resistance","Voltage","Power"],a:2,e:"Voltage is the same across all parallel branches. Current splits."},
+{c:"Electrical",q:"Class II appliance — what does it rely on?",o:["Earth conductor","Double insulation, no earth required","SELV supply","RCD protection"],a:1,e:"Class II = double insulated. No earth required. Symbol: square within a square."},
+{c:"Electrical",q:"Standard RCD personal protection trip current?",o:["10mA","100mA","30mA","300mA"],a:2,e:"30mA personal protection. 100mA / 300mA = fire and equipment."},
+{c:"Electrical",q:"When do you prove the test instrument during safe isolation?",o:["Before and after testing the dead circuit","Only before","Only after","At start of day"],a:0,e:"Prove BEFORE and AFTER testing the dead circuit."},
+{c:"Electrical",q:"Most common UK domestic earthing arrangement?",o:["TN-S","TT","TN-C-S (PME)","IT"],a:2,e:"TN-C-S (PME). Combined PEN splits at cut-out."},
+{c:"Electrical",q:"Voltage drop limit for a power circuit?",o:["3%","5%","10%","2%"],a:1,e:"5% power, 3% lighting."},
+{c:"Electrical",q:"Which wiring system is fire resistant?",o:["SWA","Flat twin and earth","MICC (Pyro)","Conduit"],a:2,e:"MICC (Mineral Insulated Copper Clad / Pyro)."},
+{c:"Electrical",q:"SELV stands for?",o:["Safe Electrical Low Voltage","Separated Extra Low Voltage","Standard Extra Low Voltage","Shielded Earth Low Voltage"],a:1,e:"Separated Extra Low Voltage — max 50V AC / 120V DC. Isolated from earth."},
+{c:"Electrical",q:"Series circuit: 4Ω + 6Ω + 10Ω?",o:["2Ω","20Ω","2.4Ω","5Ω"],a:1,e:"Series: R = 4 + 6 + 10 = 20Ω."},
+{c:"Electrical",q:"Post-2004 Line (Live) conductor colour?",o:["Red","Black","Brown","Blue"],a:2,e:"Brown = Line, Blue = Neutral, Green/Yellow = Earth."},
+{c:"Electrical",q:"RCBO combines which two devices?",o:["Fuse and MCB","RCD and MCB","RCD and fuse","MCB and surge protector"],a:1,e:"RCBO = RCD + MCB."},
+{c:"Electrical",q:"In a series circuit, what is the same throughout?",o:["Voltage","Resistance","Current","Power"],a:2,e:"Current is the same throughout a series circuit."},
+{c:"Electrical",q:"Formula for resistance?",o:["R = V × I","R = I ÷ V","R = V ÷ I","R = V + I"],a:2,e:"R = V ÷ I."},
+{c:"Electrical",q:"TT earthing differs from TN-C-S because?",o:["Combined PEN conductor","Earth electrode at premises, no metallic return path","Splits neutral at substation","Commercial only"],a:1,e:"TT uses earth electrode at premises. No metallic return path."},
+{c:"Electrical",q:"What does a fuse do that an MCB cannot?",o:["Reset automatically","Protect against earth faults","Melt to break circuit — single use","Detect current imbalance"],a:2,e:"Fuse melts — single use. MCB is resettable."},
+{c:"Electrical",q:"PELV vs SELV — key difference?",o:["PELV connected to earth; SELV isolated from earth","Same thing","PELV for lighting only","PELV uses DC only"],a:0,e:"PELV = connected to earth. SELV = isolated from earth."},
+{c:"Electrical",q:"Current drawn by a 2300W appliance on 230V?",o:["0.1A","23A","10A","100A"],a:2,e:"I = 2300 ÷ 230 = 10A."},
+{c:"Electrical",q:"Standard site voltage for portable tools?",o:["25V","230V","110V","400V"],a:2,e:"110V (yellow)."},
+{c:"Electrical",q:"Purpose of equipotential bonding?",o:["Increases current flow","Connects metalwork to prevent voltage differences","Protects against overload","Reduces resistance"],a:1,e:"Bonds metalwork to prevent dangerous voltage differences."},
+{c:"Electrical",q:"Cable used underground or for mechanical protection?",o:["Flat twin and earth","MICC","SWA (Steel Wire Armoured)","Conduit only"],a:2,e:"SWA — Steel Wire Armoured."},
+{c:"Electrical",q:"Old cable colour for Neutral?",o:["Red","Green","Blue","Black"],a:3,e:"Old: Red = Live, Black = Neutral, Green = Earth."},
+{c:"Electrical",q:"Parallel circuit: 6Ω, 12Ω, 4Ω. Total resistance?",o:["22Ω","2Ω","4Ω","0.5Ω"],a:1,e:"1/R = 1/6 + 1/12 + 1/4 = 0.5. R = 2Ω."},
+{c:"Electrical",q:"Total parallel resistance is always?",o:["Greater than largest branch","Equal to smallest branch","Less than smallest branch","Average of all branches"],a:2,e:"Always less than the smallest branch."},
+{c:"Electrical",q:"GS38 requires?",o:["Earthed metalwork","Approved test leads","Circuit isolation before work","RCDs on all circuits"],a:1,e:"GS38 = approved, insulated, fused test leads."},
+{c:"Electrical",q:"Power of a 230V appliance drawing 5A?",o:["920W","46W","1150W","235W"],a:2,e:"P = 230 × 5 = 1150W."},
+{c:"Electrical",q:"Class III maximum voltage?",o:["25V AC","110V AC","50V AC / 120V DC ripple-free","12V DC only"],a:2,e:"SELV — max 50V AC or 120V DC ripple-free."},
+{c:"Electrical",q:"Step after switching off at CU in safe isolation?",o:["Test dead","Prove tester on live source","Lock off and fit warning notice","Identify circuit"],a:2,e:"Lock off and fit warning notice before any testing."},
+{c:"Electrical",q:"MCB trips on?",o:["Earth leakage","Overload or short circuit","Voltage drop","Neutral fault"],a:1,e:"Overload or short circuit. Earth leakage = RCD."},
+{c:"Electrical",q:"Resistance in a metal increases when?",o:["CSA increases","Length decreases","Temperature increases","Voltage increases"],a:2,e:"Increases with temperature and length; decreases with larger CSA."},
+{c:"Scientific",q:"Specific heat capacity of water?",o:["4.5 kJ/kg·K","4.187 kJ/kg·K","3.9 kJ/kg·K","4.0 kJ/kg·K"],a:1,e:"4.187 kJ/kg·K."},
+{c:"Scientific",q:"Latent heat causes?",o:["Temperature rise","Change of state with no temperature change","Thermal expansion","Pressure increase"],a:1,e:"Change of state — no temperature change during transition."},
+{c:"Scientific",q:"1 metre head of water = ?",o:["1 kPa","9.81 kPa","100 kPa","0.981 kPa"],a:1,e:"9.81 kPa (~10 kPa practical)."},
+{c:"Scientific",q:"Boyle's Law?",o:["Directly proportional at constant temp","Inversely proportional at constant temp","Directly proportional at constant pressure","Inversely proportional at constant pressure"],a:1,e:"P1V1 = P2V2. Inversely proportional at constant temperature."},
+{c:"Scientific",q:"Absolute pressure =?",o:["Gauge only","Atmospheric only","Gauge + atmospheric","Gauge − atmospheric"],a:2,e:"Gauge + atmospheric (101.325 kPa at sea level)."},
+{c:"Scientific",q:"Q = ? m=10kg, c=4.187, ΔT=20°C",o:["837.4 kJ","83.74 kJ","418.7 kJ","209.35 kJ"],a:0,e:"10 × 4.187 × 20 = 837.4 kJ."},
+{c:"Scientific",q:"Dezincification — what is it?",o:["Iron leaching from steel","Zinc leaching from brass in hard water","Copper oxidising","Lead dissolving"],a:1,e:"Zinc leaches from brass. Use DZR fittings in hard water areas."},
+{c:"Scientific",q:"Tensile strength is?",o:["Resistance to crushing","Resistance to hammering","Resistance to being pulled apart","Ability to be drawn into wire"],a:2,e:"Resistance to being pulled apart."},
+{c:"Scientific",q:"LPHW flow/return differential?",o:["10°C","40°C","20°C","30°C"],a:2,e:"20°C typical."},
+{c:"Scientific",q:"Dynamic pressure vs static?",o:["Higher","Same","Lower","Unpredictable"],a:2,e:"Dynamic always lower than static."},
+{c:"Scientific",q:"RD less than 1 means?",o:["Sinks","Floats","Dissolves","Reacts"],a:1,e:"RD < 1 = floats. RD > 1 = sinks."},
+{c:"Scientific",q:"Charles's Law?",o:["Inversely proportional at constant pressure","Directly proportional at constant pressure","Inversely proportional at constant temp","Independent"],a:1,e:"Volume and temperature directly proportional at constant pressure."},
+{c:"Scientific",q:"Sensible heat does what?",o:["Changes state without changing temp","Changes temp without changing state","Causes expansion only","Increases pressure"],a:1,e:"Changes temperature. No change of state."},
+{c:"Scientific",q:"Gauge pressure is?",o:["From absolute zero","Above atmospheric","At tank bottom","Same as absolute"],a:1,e:"Measured above atmospheric."},
+{c:"Scientific",q:"Electrolytic corrosion requires?",o:["Two identical metals in water","Two dissimilar metals in contact with water","Copper in hard water","Zinc in brass"],a:1,e:"Two dissimilar metals + water present."},
+{c:"Scientific",q:"Density of water?",o:["100 kg/m³","10 kg/m³","1000 kg/m³","500 kg/m³"],a:2,e:"1000 kg/m³ = 1 kg per litre."},
+{c:"Scientific",q:"Thermal linear expansion formula?",o:["length × temp","length × coefficient × temp rise","coefficient ÷ temp","length ÷ coefficient"],a:1,e:"Length × coefficient × temperature rise."},
+{c:"Scientific",q:"Why water in LPHW?",o:["Cheap","High SHC — stores and carries heat","Low viscosity","Doesn't expand"],a:1,e:"High SHC (4.187 kJ/kg·K)."},
+{c:"Scientific",q:"Pascal's Law?",o:["Downwards only","Upwards only","Direction of flow","Equally in all directions"],a:3,e:"Pressure acts equally in all directions."},
+{c:"Scientific",q:"Copper 4m, 50°C rise, coeff 0.000017. Expansion?",o:["3.4mm","0.34mm","34mm","0.034mm"],a:0,e:"4 × 0.000017 × 50 = 0.0034m = 3.4mm."},
+{c:"Scientific",q:"Ferrous vs non-ferrous?",o:["Contains zinc","Contains iron — rusts","Used only for fittings","Doesn't conduct electricity"],a:1,e:"Ferrous = iron, rusts. Non-ferrous = no iron, corrosion resistant."},
+{c:"Scientific",q:"Ductile means?",o:["Compressed without cracking","Drawn into wire or bent without breaking","Returns to shape","Resists impact"],a:1,e:"Drawn into wire or bent without breaking."},
+{c:"Scientific",q:"Atmospheric pressure at sea level?",o:["10.1 kPa","1013.25 kPa","101.325 kPa","1.01325 kPa"],a:2,e:"101.325 kPa."},
+{c:"Scientific",q:"Volume formula?",o:["mass × density","density ÷ mass","mass ÷ density","mass + density"],a:2,e:"Volume = mass ÷ density."},
+{c:"Processes",q:"R220 copper pipe?",o:["Hard, thin wall","Half-hard, most common","Soft, thick wall, coils, microbore","Hard, rarely used"],a:2,e:"R220 — fully annealed (soft), thicker wall. Underground and microbore."},
+{c:"Processes",q:"Pipe gain?",o:["Add to cut length","Extra pipe at joints","Subtract from measured length","Depth of former"],a:2,e:"Subtract from measured length to get correct cut length."},
+{c:"Processes",q:"Maximum notch depth in a joist?",o:["1/4","1/8","1/3","1/5"],a:1,e:"1/8 of joist depth. Top, near supports."},
+{c:"Processes",q:"Joist hole zone?",o:["0.1–0.2 from support","0.25–0.4 from support","Middle third only","Anywhere on neutral axis"],a:1,e:"0.25–0.4 of span, middle third of depth."},
+{c:"Processes",q:"PTFE on compression fittings?",o:["Yes, male thread","Yes, on olive","No — olive seals","Only Type B"],a:2,e:"Never. The olive does the sealing."},
+{c:"Processes",q:"Yellow MDPE is for?",o:["Cold water mains","Drainage","Gas","Heating"],a:2,e:"Yellow = gas. Blue = cold water mains."},
+{c:"Processes",q:"Which plastic has shape memory?",o:["uPVC","Polybutylene","PEX","MDPE"],a:2,e:"PEX returns to round shape when heated."},
+{c:"Processes",q:"Before soldering a capillary fitting you apply?",o:["PTFE","Boss white","Flux","Jointing compound"],a:2,e:"Flux — cleans and prevents oxidation."},
+{c:"Processes",q:"Type B vs Type A compression?",o:["Uses PTFE","Pipe end flared — underground","Demountable","No modification"],a:1,e:"Type B — pipe end flared. Underground use."},
+{c:"Processes",q:"Max hole diameter in a joist?",o:["1/8","1/3","1/4","1/2"],a:2,e:"1/4 of joist depth. Min spacing = 3 × diameter."},
+{c:"Processes",q:"Flux purpose?",o:["Seals joint","Cleans and prevents oxidation","Fills gaps","Replaces solder"],a:1,e:"De-oxidises metal so solder flows and bonds."},
+{c:"Processes",q:"Excess flux after soldering?",o:["Leave it","Wash off immediately","Clean off — causes corrosion","Heat off"],a:2,e:"Clean off — causes corrosion if left."},
+{c:"Processes",q:"Domestic water solder must be?",o:["Lead-based","Lead-free","Silver only","Flux-core only"],a:1,e:"Lead-free — lead contaminates water."},
+{c:"Processes",q:"Solder ring vs end-feed?",o:["No heat","Pre-loaded solder","Flux outside only","Not for hot water"],a:1,e:"Solder ring (Yorkshire) = pre-loaded solder."},
+{c:"Processes",q:"Notch zone in joist?",o:["Bottom, mid-span","Top, 0.1–0.2 from support","Bottom, near support","Middle anywhere"],a:1,e:"Top, 0.1–0.2 of span from support."},
+{c:"Processes",q:"Push-fit on plastic pipe requires?",o:["Flux","PTFE","Pipe insert to prevent collapse","Olive"],a:2,e:"Pipe inserts prevent collapse under compression."},
+{c:"Processes",q:"PTFE tape direction?",o:["Anti-clockwise from end","Clockwise — direction of thread","Doesn't matter","Clockwise from back"],a:1,e:"Clockwise from male end, direction of thread."},
+{c:"Processes",q:"uPVC suitable for?",o:["Hot water","Central heating","Cold water and waste/soil","Underfloor heating"],a:2,e:"Cold water, waste and soil. Max ~60°C."},
+{c:"Processes",q:"R250 copper pipe?",o:["Soft, coils","Half-hard, most common above-ground","Thin walls","Hard, rarely used"],a:1,e:"R250 — half-hard, most common above-ground."},
+{c:"Processes",q:"BSP stands for?",o:["British Standard Pipe","British Standard Plumbing","British Specification Profile","Building Services Pipe"],a:0,e:"British Standard Pipe."},
+{c:"Processes",q:"Min spacing between joist holes?",o:["2 × dia","3 × dia","5 × dia","Equal to dia"],a:1,e:"3 × hole diameter."},
+{c:"Processes",q:"BS EN 1057 covers?",o:["Plastic pipe","Electrical wiring","Copper tubes","Soil systems"],a:2,e:"Copper tubes — R220/R250/R290."},
+{c:"Processes",q:"MDPE joined by?",o:["Capillary","Compression only","Butt fusion, electrofusion, or compression","Push-fit only"],a:2,e:"Butt fusion, electrofusion, or mechanical compression."},
+{c:"Processes",q:"15mm copper 90° bend — pipe gain?",o:["2mm","4mm","10mm","6mm"],a:1,e:"~4mm. 22mm ≈ 6mm."},
+{c:"Health & Safety",q:"RIDDOR 3-day injury timeframe?",o:["7 days","10 days","21 days","15 days"],a:3,e:"15 days. Deaths immediately."},
+{c:"Health & Safety",q:"Max unsupported excavation depth?",o:["0.5m","1.2m","2.0m","1.5m"],a:1,e:"1.2m. Deeper: batter, bench, or shore."},
+{c:"Health & Safety",q:"Extinguisher for cooking oil?",o:["CO₂","Dry powder","Foam","Wet chemical"],a:3,e:"Wet chemical only. Never water or CO₂."},
+{c:"Health & Safety",q:"HSE Prohibition Notice?",o:["21 days to comply","Work stops immediately","Verbal warning","Pay fine, continue"],a:1,e:"Immediate work stoppage."},
+{c:"Health & Safety",q:"Spoil minimum distance from excavation edge?",o:["Depth of trench","500mm","1 metre","2 metres"],a:2,e:"1 metre — fixed, not depth-dependent."},
+{c:"Health & Safety",q:"Max working pressure for acetylene?",o:["5 PSI","15 PSI","25 PSI","8 PSI"],a:1,e:"Never exceed 15 PSI. Working 5–8 PSI."},
+{c:"Health & Safety",q:"Risk rating: Likelihood 4 × Consequence 4?",o:["8 — Low","12 — Medium","16 — High","20 — High"],a:2,e:"16. 13–25 = High. Stop work."},
+{c:"Health & Safety",q:"COSHH — how many steps?",o:["5","6","8","10"],a:2,e:"8 steps."},
+{c:"Health & Safety",q:"Most dangerous asbestos fibres?",o:["White (Chrysotile)","Brown (Amosite)","Blue (Crocidolite)","All equal"],a:2,e:"Blue (Crocidolite). Brown most dangerous in board form."},
+{c:"Health & Safety",q:"Ladder 4:1 rule?",o:["Extend 4m above","4m up, 1m out (≈75°)","Max 4 rungs above tie","4 people max"],a:1,e:"75°. 4 units up, 1 unit out."},
+{c:"Health & Safety",q:"ACOP legal status?",o:["Fully mandatory","Advisory only","Not an offence to ignore, but evidence of guilt if prosecuted","5+ staff only"],a:2,e:"Not an offence to ignore, but evidence of guilt if prosecuted."},
+{c:"Health & Safety",q:"Burns first aid — how long?",o:["2 mins","5 mins","10 mins","20 mins"],a:2,e:"10 mins cold water. No cream. Don't burst blisters."},
+{c:"Health & Safety",q:"HASAWA Section 7?",o:["Provide PPE","Take reasonable care for self and others","Write RAs","Report all accidents"],a:1,e:"Employees take reasonable care for themselves and others."},
+{c:"Health & Safety",q:"Work at Height hierarchy?",o:["Minimise → Prevent → Avoid","Avoid → Prevent → Minimise","Prevent → Minimise → Avoid","Minimise → Avoid → Prevent"],a:1,e:"Avoid → Prevent → Minimise."},
+{c:"Health & Safety",q:"Hearing protection required above?",o:["70 dB(A)","80 dB(A)","90 dB(A)","100 dB(A)"],a:1,e:"80 dB(A). Upper limit 87 dB(A)."},
+{c:"Health & Safety",q:"Propane heavier than air means?",o:["Rises to ceiling","Pools in trenches — never use in excavations","Disperses safely","Safer than MAPP indoors"],a:1,e:"Pools in low areas. Never use in excavations."},
+{c:"Health & Safety",q:"PASS technique?",o:["Pull, Aim high, Squeeze, Sweep","Pull, Aim at base, Squeeze, Sweep","Point, Aim, Spray, Stand back","Pull, Apply, Smother, Secure"],a:1,e:"Pull → Aim base → Squeeze → Sweep. 3m back."},
+{c:"Health & Safety",q:"Extinguisher for liquid (B) and gas (C)?",o:["Water","Foam","Wet chemical","CO₂"],a:3,e:"CO₂ covers B, C and E."},
+{c:"Health & Safety",q:"Yellow triangle sign means?",o:["Mandatory","Safe condition","Warning / danger","Prohibition"],a:2,e:"Warning/danger."},
+{c:"Health & Safety",q:"Manual handling approach?",o:["Always team lift","Avoid where possible; kinetic if unavoidable","Always use back belt","No limit under 25kg"],a:1,e:"Avoid where possible. Kinetic technique if unavoidable."},
+{c:"Health & Safety",q:"Asbestos suspected?",o:["Mark and continue","Stop, withdraw, report, licensed contractor","Remove sample","Wet and continue"],a:1,e:"STOP → WITHDRAW → REPORT → Licensed contractor."},
+{c:"Health & Safety",q:"Mesothelioma latency?",o:["5–10 years","10–20 years","30–40 years","1–5 years"],a:2,e:"30–40 years."},
+{c:"Health & Safety",q:"LPG never stored?",o:["Upright","Outdoors","Below ground","Locked cage"],a:2,e:"Never below ground. Never in boiler rooms."},
+{c:"Health & Safety",q:"Improvement Notice — minimum time?",o:["7 days","14 days","21 days","28 days"],a:2,e:"21 days minimum."},
+{c:"Health & Safety",q:"Hazard vs Risk?",o:["Same","Hazard = may cause harm; Risk = chance + severity","Hazard = injury; Risk = cause","Risk always higher"],a:1,e:"Hazard = anything that MAY cause harm. Risk = CHANCE + severity."},
+{c:"Health & Safety",q:"CPR ratio and rate?",o:["15:2 at 80/min","30:2 at 100–120/min","30:2 at 60/min","15:1 at 100/min"],a:1,e:"30:2 at 100–120/min. 4–5cm depth."},
+{c:"Health & Safety",q:"Safety footwear standard?",o:["BS EN 166","EN 20345","BS EN 397","EN 388"],a:1,e:"EN 20345 — steel toecap and midsole."},
+{c:"Health & Safety",q:"Max indoor tower scaffold ratio?",o:["3× base","3.5× base","4× base","5× base"],a:1,e:"3.5× shortest base indoors. 3× outdoors."},
+{c:"Health & Safety",q:"Oxygen storage distance from LPG?",o:["1m","2m","3m","5m"],a:2,e:"3m minimum or 30-min fire wall."},
+{c:"Health & Safety",q:"Permit to Work vs Method Statement?",o:["PTW informal","PTW = formal written authorisation, names persons, time frame, written declaration on completion","PTW for all work","Same thing"],a:1,e:"PTW = formal authorisation for high-risk work. Written declaration on completion."},
+{c:"Construction",q:"Client's on-site representative?",o:["Site Supervisor","Trade Supervisor","Clerk of Works","BCO"],a:2,e:"Clerk of Works — ensures work meets agreed plans on behalf of the client."},
+{c:"Construction",q:"CDM 2015 — when notifiable?",o:["Any project >30 days","30+ days AND 20+ simultaneous workers, OR 500+ person-days","5+ workers","Over £100k"],a:1,e:"30+ days AND 20+ workers, OR 500+ person-days."},
+{c:"Construction",q:"Purpose of a Variation Order?",o:["Daily diary","Formal written instruction for scope change, signed by client","Verbal agreement","HSE notice"],a:1,e:"Formal written, client-signed before work proceeds."},
+{c:"Construction",q:"Quantity Surveyor role?",o:["Inspects work","Controls costs, bills of quantities, values variations","Issues planning permission","Manages deliveries"],a:1,e:"QS: costs, bills of quantities, values variations."},
+{c:"Construction",q:"Risk score requiring immediate action?",o:["1–5","6–12","13–25","20–25 only"],a:2,e:"13–25 = High. Stop work."},
+{c:"Construction",q:"Key principle of communication?",o:["Always written","Communication has only worked when it has been understood","Verbal always better","Use diagrams"],a:1,e:"Communication has only worked when it has been understood."},
+{c:"Construction",q:"Purpose of a Method Statement?",o:["Record accidents","Step-by-step safe system of work, produced after RA","Financial record","Daily log"],a:1,e:"Step-by-step safe system of work. Required at tendering."},
+{c:"Construction",q:"ACAS role?",o:["Issues HSE notices","Free impartial employment mediation","Sets building regs","Certifies gas engineers"],a:1,e:"Advisory, Conciliation and Arbitration Service. Free employment mediation."},
+{c:"Construction",q:"First fix plumbing?",o:["Appliances after decoration","Pipework before plastering","Commissioning","Snagging"],a:1,e:"Pipework before plastering. Second fix = appliances after decoration."},
+{c:"Construction",q:"Gantt chart used for?",o:["Recording accidents","Planned sequence, timing and duration","Listing materials","Labour costs"],a:1,e:"Work programme — coordinates trades, monitors progress."},
+{c:"Construction",q:"Snagging list?",o:["Materials to order","Defects at end of job, rectified before handover","Record of VOs","Subcontractor list"],a:1,e:"Defects at completion, rectified before handover."},
+{c:"Construction",q:"Equality Act 2010?",o:["Company policy","Protected characteristics — age, gender, race, disability, religion etc","Length of employment","Job title"],a:1,e:"9 protected characteristics."},
+{c:"Construction",q:"BCO role?",o:["Enforce H&S","Building regs compliance at key stages (local authority)","Represent client","Manage subcontractors"],a:1,e:"Local authority — checks building regs at key stages."},
+{c:"Construction",q:"Manufacturers' instructions legal status?",o:["Mandatory like Acts","Advisory — deviation can void warranty and breach regs","No legal standing","Mandatory for gas only"],a:1,e:"Advisory, but deviation can void warranty and breach regulations."},
+{c:"Construction",q:"Level 2 authority?",o:["Authorise VOs to £500","Carry out work as instructed; report problems; cannot authorise variations","Supervise autonomously","Sign off RAMS"],a:1,e:"Carry out work as instructed. Cannot authorise variations."},
+{c:"Construction",q:"As-built drawings?",o:["Before construction","Record of what was actually installed","Structural only","Replace specification"],a:1,e:"Final record of what was actually installed."},
+{c:"Construction",q:"Formal quotations must be?",o:["Verbal","In writing","Within 48hrs","Countersigned by HSE"],a:1,e:"In writing."},
+{c:"Construction",q:"CDM 2015 H&S file?",o:["Destroyed on completion","Stays with building until demolition","Kept by contractor","Submitted to HSE"],a:1,e:"Stays with the building until demolition."},
+{c:"Construction",q:"Maximum possible risk score?",o:["10","15","25","50"],a:2,e:"5 × 5 = 25."}
+];
+
+let activeFilter='All',timerSecs=0,timerInt=null;
+let qs=[],cur=0,sc=0,wr=0,missed=[],answered=false,isWeak=false,isFlag=false;
+let wsConsec={},curQ=null;
 
 function qKey(q){return q.c+'||'+q.q;}
 
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
-function goHome(){renderHome();show('s-home');}
+function showTab(id,el){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='home')renderHome();
+  if(id==='stats')renderStats();
+  if(id==='revision')renderRevision();
+}
 
-function setFilter(f,el){activeFilter=f;document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+function setFilter(f,el,gid){
+  activeFilter=f;
+  document.querySelectorAll('#'+gid+' .fbtn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setTimer(s,el){
+  timerSecs=s;
+  ['t-off','t-20','t-30'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  el.classList.add('active');
+}
+
+function showCS(id,el){
+  document.querySelectorAll('.cs-unit').forEach(u=>u.classList.remove('active'));
+  document.querySelectorAll('.cs-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
 
 function getWeakSpots(fails){
   return Q.map(q=>({q,fails:fails[qKey(q)]||0})).filter(x=>x.fails>0).sort((a,b)=>b.fails-a.fails).slice(0,WEAK_SIZE);
 }
+function getFlagged(d){return Q.filter(q=>(d.flagged||[]).includes(qKey(q)));}
 
 function renderHome(){
   const d=loadData();
-  const fails=d.fails||{};
-  const sessions=d.sessions||[];
-  const ws=getWeakSpots(fails);
-
+  const ws=getWeakSpots(d.fails||{});
+  const sess=d.sessions||[];
   document.getElementById('h-total').textContent=d.totalAnswered||0;
+  document.getElementById('h-streak').textContent=d.streak||0;
   document.getElementById('h-weak').textContent=ws.length;
-  document.getElementById('h-sessions').textContent=sessions.length;
-  document.getElementById('h-avg').textContent=sessions.length?Math.round(sessions.reduce((s,x)=>s+x.pct,0)/sessions.length)+'%':'—';
-
-  const wsDisabled=ws.length===0;
-  document.getElementById('wsBtn').disabled=wsDisabled;
-  document.getElementById('r-wsBtn').disabled=wsDisabled;
-
-  const hl=document.getElementById('hist-list');
-  if(!sessions.length){hl.innerHTML='<div class="empty-state">No sessions yet.</div>';}
-  else{hl.innerHTML=sessions.slice().reverse().slice(0,10).map(s=>`<div class="hist-item"><span style="color:var(--muted);font-size:0.8rem">${s.mode==='weak'?'⚡ Weak spots':'📋 '+s.filter} &nbsp;·&nbsp; ${s.total}q</span><span class="pct">${s.pct}%</span></div>`).join('');}
-
-  const wl=document.getElementById('weak-list');
-  if(!ws.length){wl.innerHTML='<div class="empty-state">None yet — complete some quizzes.</div>';}
-  else{wl.innerHTML=ws.slice(0,10).map(w=>`<div class="weak-item"><span style="flex:1">${w.q.q}</span><span class="fails">${w.fails}✗</span></div>`).join('')+(ws.length>10?`<div class="empty-state" style="padding-top:8px">+${ws.length-10} more</div>`:'' );}
+  document.getElementById('h-avg').textContent=sess.length?Math.round(sess.reduce((s,x)=>s+x.pct,0)/sess.length)+'%':'—';
+  ['wsBtn','wsBtn2','r-wsBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=ws.length===0;});
+  const fd=getFlagged(d).length===0;
+  ['flagBtn','flagBtn2','drillFlagBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=fd;});
+  const hl=document.getElementById('h-hist');
+  hl.innerHTML=!sess.length?'<div class="empty-state">No sessions yet.</div>':sess.slice().reverse().slice(0,8).map(s=>`<div class="list-item"><span class="dim">${s.mode==='weak'?'⚡ Weak':s.mode==='flag'?'⚑ Flagged':'📋 '+s.filter} · ${s.total}q</span><span class="pct">${s.pct}%</span></div>`).join('');
+  const wl=document.getElementById('h-wl');
+  wl.innerHTML=!ws.length?'<div class="empty-state">None yet.</div>':ws.slice(0,5).map(w=>`<div class="weak-item"><span style="flex:1">${w.q.q}</span><span class="fails">${w.fails}✗</span></div>`).join('');
 }
+
+function renderStats(){
+  const d=loadData();
+  const cats=['Electrical','Scientific','Processes','Health & Safety','Construction'];
+  const cs=d.catStats||{};
+  document.getElementById('cat-stats').innerHTML=cats.map(cat=>{
+    const s=cs[cat]||{correct:0,total:0};
+    const pct=s.total?Math.round(s.correct/s.total*100):0;
+    const col=pct>=80?'var(--success)':pct>=60?'var(--warning)':'var(--danger)';
+    return `<div class="cat-bar-row"><div class="cat-bar-label"><span>${cat}</span><span style="font-family:'DM Mono',monospace;font-size:0.72rem;color:${col}">${pct}% (${s.correct}/${s.total})</span></div><div class="cat-bar-track"><div class="cat-bar-fill" style="width:${pct}%;background:${col}"></div></div></div>`;
+  }).join('');
+  const sess=d.sessions||[];
+  document.getElementById('all-hist').innerHTML=!sess.length?'<div class="empty-state">No sessions yet.</div>':sess.slice().reverse().map(s=>`<div class="list-item"><span class="dim">${s.mode==='weak'?'⚡ Weak':s.mode==='flag'?'⚑ Flagged':'📋 '+s.filter} · ${s.total}q</span><span class="pct">${s.pct}%</span></div>`).join('');
+  const ws=getWeakSpots(d.fails||{});
+  document.getElementById('full-weak').innerHTML=!ws.length?'<div class="empty-state">None yet.</div>':ws.map(w=>`<div class="weak-item"><span style="flex:1">${w.q.q}</span><span class="fails">${w.fails}✗</span></div>`).join('');
+}
+
+function renderRevision(){
+  const d=loadData();
+  const checks=d.checks||{};
+  const done=CHECKS.filter(c=>checks[c.id]).length;
+  const pct=Math.round(done/CHECKS.length*100);
+  document.getElementById('check-pct').textContent=pct+'%';
+  document.getElementById('check-fill').style.width=pct+'%';
+  document.getElementById('check-list').innerHTML=CHECKS.map(c=>`
+    <label class="check-item">
+      <input type="checkbox" ${checks[c.id]?'checked':''} onchange="toggleCheck('${c.id}')">
+      <div><span class="check-label${checks[c.id]?' done':''}">${c.text}</span><span class="check-cat">${c.cat}</span></div>
+    </label>`).join('');
+  const flagged=getFlagged(d);
+  document.getElementById('flag-list').innerHTML=!flagged.length?'<div class="empty-state">No flagged questions yet.</div>':flagged.map(q=>`<div class="weak-item"><span style="flex:1">[${q.c}] ${q.q}</span><span style="color:var(--flag);font-size:0.72rem">⚑</span></div>`).join('');
+}
+
+function toggleCheck(id){
+  const d=loadData();d.checks=d.checks||{};d.checks[id]=!d.checks[id];saveData(d);renderRevision();
+}
+function resetChecklist(){if(confirm('Reset checklist?')){const d=loadData();d.checks={};saveData(d);renderRevision();}}
+function clearFlags(){if(confirm('Clear all flagged questions?')){const d=loadData();d.flagged=[];saveData(d);renderRevision();renderHome();}}
 
 function shuf(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a;}
 
-function startQuiz(weakMode){
+function startQuiz(weakMode,flagMode){
+  stopTimer();
   const d=loadData();
-  isWeakSpots=weakMode;
-  wsConsecCorrect={};
-  sessionMissed=[];sc=0;wr=0;cur=0;answered=false;
+  isWeak=weakMode;isFlag=flagMode;
+  wsConsec={};missed=[];sc=0;wr=0;cur=0;answered=false;
   document.getElementById('scoreEl').textContent=0;
   document.getElementById('wrongEl').textContent=0;
 
@@ -349,32 +703,44 @@ function startQuiz(weakMode){
     const ws=getWeakSpots(d.fails||{});
     if(!ws.length){alert('No weak spots yet.');return;}
     qs=shuf(ws.map(w=>w.q));
+  } else if(flagMode){
+    const fp=getFlagged(d);
+    if(!fp.length){alert('No flagged questions yet.');return;}
+    qs=shuf([...fp]);
   } else {
     const pool=activeFilter==='All'?Q:Q.filter(q=>q.c===activeFilter);
     qs=shuf([...pool]).slice(0,30);
   }
-  show('s-quiz');
-  load();
+
+  document.getElementById('qsetup').style.display='none';
+  document.getElementById('qactive').style.display='block';
+  document.getElementById('qresult').style.display='none';
+  // switch to quiz tab
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-quiz').classList.add('active');
+  document.querySelectorAll('.nav-btn')[1].classList.add('active');
+  loadQ();
 }
 
-function load(){
+function loadQ(){
   answered=false;
-  const q=qs[cur];
+  curQ=qs[cur];
+  const q=curQ;
   const d=loadData();
-
   const banner=document.getElementById('ws-banner');
-  if(isWeakSpots){
-    const remaining=getWeakSpots(d.fails||{}).length;
-    banner.style.display='block';
-    banner.textContent='⚡ Weak spots mode — '+remaining+' in pool. Pass each twice to clear. Q'+(cur+1)+' of '+qs.length+'.';
-  } else {banner.style.display='none';}
-
+  if(isWeak){banner.style.display='block';banner.textContent='⚡ Weak spots — '+getWeakSpots(d.fails||{}).length+' in pool. Pass twice to clear. Q'+(cur+1)+'/'+qs.length;}
+  else if(isFlag){banner.style.display='block';banner.textContent='⚑ Flagged questions — '+qs.length+' total';}
+  else{banner.style.display='none';}
   document.getElementById('catTag').textContent=q.c;
   document.getElementById('qcount').textContent=(cur+1)+' / '+qs.length;
-  document.getElementById('pbar').style.width=Math.round((cur/qs.length)*100)+'%';
+  document.getElementById('pbar').style.width=Math.round(cur/qs.length*100)+'%';
   document.getElementById('qtext').textContent=q.q;
   const fb=document.getElementById('fb');fb.className='fb';fb.textContent='';
   document.getElementById('nbtn').style.display='none';
+  const fqb=document.getElementById('flagQBtn');
+  fqb.style.display='none';
+  fqb.textContent=(d.flagged||[]).includes(qKey(q))?'⚑ Unflag':'⚑ Flag this';
   const o=document.getElementById('opts');o.innerHTML='';
   const keys=['A','B','C','D'];
   const so=q.o.map((t,i)=>({t,orig:i}));shuf(so);
@@ -384,71 +750,102 @@ function load(){
     b.onclick=()=>pick(opt.orig===q.a,b,so,q);
     o.appendChild(b);
   });
+  if(timerSecs>0)startTimer();
+}
+
+function startTimer(){
+  stopTimer();
+  let rem=timerSecs;
+  const el=document.getElementById('timerEl');
+  el.style.display='inline-block';el.className='timer-el';el.textContent=rem+'s';
+  timerInt=setInterval(()=>{
+    rem--;el.textContent=rem+'s';
+    if(rem<=10)el.className='timer-el warn';
+    if(rem<=5)el.className='timer-el crit';
+    if(rem<=0){
+      stopTimer();
+      if(!answered&&curQ){
+        const d=loadData();d.totalAnswered=(d.totalAnswered||0)+1;
+        const k=qKey(curQ);d.fails[k]=(d.fails[k]||0)+1;
+        d.catStats=d.catStats||{};d.catStats[curQ.c]=d.catStats[curQ.c]||{correct:0,total:0};
+        d.catStats[curQ.c].total++;d.streak=0;saveData(d);
+        answered=true;missed.push(curQ);wr++;document.getElementById('wrongEl').textContent=wr;
+        document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+        const fb=document.getElementById('fb');fb.className='fb bad show';fb.textContent='⏱ Time up! ✗ '+curQ.e;
+        document.getElementById('nbtn').style.display='inline-block';
+        document.getElementById('flagQBtn').style.display='inline-block';
+      }
+    }
+  },1000);
+}
+
+function stopTimer(){
+  if(timerInt){clearInterval(timerInt);timerInt=null;}
+  const el=document.getElementById('timerEl');if(el)el.style.display='none';
 }
 
 function pick(correct,btn,so,q){
-  if(answered)return;answered=true;
-  const d=loadData();
-  d.totalAnswered=(d.totalAnswered||0)+1;
+  if(answered)return;stopTimer();answered=true;
+  const d=loadData();d.totalAnswered=(d.totalAnswered||0)+1;
   const k=qKey(q);
+  d.catStats=d.catStats||{};d.catStats[q.c]=d.catStats[q.c]||{correct:0,total:0};d.catStats[q.c].total++;
   document.querySelectorAll('.opt').forEach((b,i)=>{b.disabled=true;if(so[i].orig===q.a)b.classList.add('correct');});
   const fb=document.getElementById('fb');
-
   if(correct){
-    btn.classList.add('correct');sc++;
-    document.getElementById('scoreEl').textContent=sc;
-    fb.className='fb ok show';
+    btn.classList.add('correct');sc++;document.getElementById('scoreEl').textContent=sc;
+    d.catStats[q.c].correct++;d.streak=(d.streak||0)+1;
     let msg='✓ '+q.e;
-    if(isWeakSpots){
-      wsConsecCorrect[k]=(wsConsecCorrect[k]||0)+1;
-      if(wsConsecCorrect[k]>=WEAK_PASS_NEEDED){
-        delete d.fails[k];
-        msg='✓ '+q.e+' — Cleared from weak spots!';
-      } else {
-        msg='✓ '+q.e+' — Pass '+(wsConsecCorrect[k])+'/'+WEAK_PASS_NEEDED+' needed to clear.';
-      }
-    }
-    fb.textContent=msg;
+    if(isWeak){wsConsec[k]=(wsConsec[k]||0)+1;if(wsConsec[k]>=WEAK_PASS){delete d.fails[k];msg='✓ '+q.e+' — Cleared!';}else{msg='✓ '+q.e+' — Pass '+wsConsec[k]+'/'+WEAK_PASS+' to clear.';}}
+    fb.className='fb ok show';fb.textContent=msg;
   } else {
-    btn.classList.add('wrong');wr++;
-    document.getElementById('wrongEl').textContent=wr;
-    sessionMissed.push(q);
-    fb.className='fb bad show';
-    fb.textContent='✗ '+q.e;
-    d.fails[k]=(d.fails[k]||0)+1;
-    if(isWeakSpots)wsConsecCorrect[k]=0;
+    btn.classList.add('wrong');wr++;document.getElementById('wrongEl').textContent=wr;
+    missed.push(q);d.fails[k]=(d.fails[k]||0)+1;d.streak=0;
+    if(isWeak)wsConsec[k]=0;
+    fb.className='fb bad show';fb.textContent='✗ '+q.e;
   }
   saveData(d);
   document.getElementById('nbtn').style.display='inline-block';
+  document.getElementById('flagQBtn').style.display='inline-block';
+  document.getElementById('flagQBtn').textContent=(d.flagged||[]).includes(k)?'⚑ Unflag':'⚑ Flag this';
 }
 
-function next(){cur++;if(cur>=qs.length)showResult();else load();}
+function flagCurrentQ(){
+  if(!curQ)return;
+  const d=loadData();d.flagged=d.flagged||[];
+  const k=qKey(curQ);
+  if(d.flagged.includes(k)){d.flagged=d.flagged.filter(f=>f!==k);document.getElementById('flagQBtn').textContent='⚑ Flag this';}
+  else{d.flagged.push(k);document.getElementById('flagQBtn').textContent='⚑ Unflag';}
+  saveData(d);
+}
+
+function nextQ(){cur++;if(cur>=qs.length)showResult();else loadQ();}
 
 function showResult(){
-  const pct=Math.round((sc/qs.length)*100);
+  stopTimer();
+  const pct=Math.round(sc/qs.length*100);
   document.getElementById('r-pct').textContent=pct+'%';
-  document.getElementById('r-sub').textContent=sc+' correct out of '+qs.length+(isWeakSpots?' · weak spots mode':'· '+activeFilter);
-
-  const clearedCount=Object.keys(wsConsecCorrect).filter(k=>wsConsecCorrect[k]>=WEAK_PASS_NEEDED).length;
+  document.getElementById('r-sub').textContent=sc+' / '+qs.length+(isWeak?' · weak spots':isFlag?' · flagged':' · '+activeFilter);
+  const cleared=Object.keys(wsConsec).filter(k=>wsConsec[k]>=WEAK_PASS).length;
   const cb=document.getElementById('cleared-banner');
-  if(isWeakSpots&&clearedCount>0){cb.style.display='block';cb.textContent='✓ '+clearedCount+' question'+(clearedCount>1?'s':'')+' cleared from weak spots pool.';}
+  if(isWeak&&cleared>0){cb.style.display='block';cb.textContent='✓ '+cleared+' question'+(cleared>1?'s':'')+' cleared.';}
   else{cb.style.display='none';}
-
-  const d=loadData();
-  d.sessions=d.sessions||[];
-  d.sessions.push({pct,total:qs.length,mode:isWeakSpots?'weak':'normal',filter:activeFilter,ts:Date.now()});
-  if(d.sessions.length>SESSION_LIMIT)d.sessions=d.sessions.slice(-SESSION_LIMIT);
+  const d=loadData();d.sessions=d.sessions||[];
+  d.sessions.push({pct,total:qs.length,mode:isWeak?'weak':isFlag?'flag':'normal',filter:activeFilter,ts:Date.now()});
+  if(d.sessions.length>100)d.sessions=d.sessions.slice(-100);
   saveData(d);
-
   const ml=document.getElementById('r-missed');
-  if(!sessionMissed.length){ml.innerHTML='<div class="empty-state" style="color:var(--success)">Clean sheet this session.</div>';}
-  else{ml.innerHTML=sessionMissed.map(q=>`<div class="missed-item"><strong>[${q.c}]</strong> ${q.q}<br><span style="color:var(--muted);font-size:0.8rem">${q.e}</span></div>`).join('');}
-
-  show('s-result');
+  ml.innerHTML=!missed.length?'<div class="empty-state" style="color:var(--success)">Clean sheet.</div>':missed.map(q=>`<div class="missed-item"><strong>[${q.c}]</strong> ${q.q}<br><span style="color:var(--muted);font-size:0.76rem">${q.e}</span></div>`).join('');
+  document.getElementById('qactive').style.display='none';
+  document.getElementById('qresult').style.display='block';
 }
 
-function clearData(){
-  if(confirm('Clear all quiz history and weak spot data?')){try{localStorage.removeItem(STORE);}catch(e){}renderHome();}}
+function endQuiz(){
+  document.getElementById('qresult').style.display='none';
+  document.getElementById('qsetup').style.display='block';
+  renderHome();
+}
+
+function clearData(){if(confirm('Clear all data?')){try{localStorage.removeItem(STORE);}catch(e){}renderHome();}}
 
 renderHome();
 </script>
