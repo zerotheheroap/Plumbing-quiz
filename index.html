@@ -6,7 +6,7 @@
 <title>L2 Plumbing Revision</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;500&display=swap');
-:root{--bg:#0f0f0f;--surface:#181818;--border:#2a2a2a;--accent:#e8c547;--accent2:#4ec9b0;--danger:#f44747;--success:#4ec94e;--warning:#e89c47;--text:#d4d4d4;--muted:#666;--ok-bg:#1a2e1a;--bad-bg:#2e1a1a;--warn-bg:#2e241a;--flag:#c084fc}
+:root{--bg:#0f0f0f;--surface:#181818;--border:#2a2a2a;--accent:#e8c547;--accent2:#4ec9b0;--danger:#f44747;--success:#4ec94e;--warning:#e89c47;--text:#d4d4d4;--muted:#666;--ok-bg:#1a2e1a;--bad-bg:#2e1a1a;--warn-bg:#2e241a;--flag:#c084fc;--learned:#3b82f6}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 60px}
 .wrap{width:100%;max-width:700px;padding:0 16px}
@@ -24,9 +24,15 @@ nav{width:100%;background:var(--surface);border-bottom:1px solid var(--border);p
 .stat-card .big.streak{color:var(--warning)}
 .stat-card .lbl{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:0.08em;margin-top:3px}
 .sec-hd{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin:18px 0 8px}
-.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.filter-group{margin-bottom:12px}
+.filter-label{font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap}
 .fbtn{font-family:'DM Mono',monospace;font-size:0.6rem;padding:4px 9px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;letter-spacing:0.06em}
 .fbtn.active{border-color:var(--accent);color:var(--accent);background:rgba(232,197,71,0.07)}
+.fbtn.d1.active{border-color:#4ec9b0;color:#4ec9b0;background:rgba(78,201,176,0.07)}
+.fbtn.d2.active{border-color:#e89c47;color:#e89c47;background:rgba(232,156,71,0.07)}
+.fbtn.d3.active{border-color:#f44747;color:#f44747;background:rgba(244,71,71,0.07)}
+.fbtn.tag.active{border-color:#c084fc;color:#c084fc;background:rgba(192,132,252,0.07)}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap}
 .btn{font-family:'Barlow Condensed',sans-serif;font-size:0.88rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:9px 16px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;transition:all 0.15s}
 .btn:hover:not(:disabled){background:var(--surface)}
@@ -35,6 +41,7 @@ nav{width:100%;background:var(--surface);border-bottom:1px solid var(--border);p
 .btn.warn{border-color:var(--warning);color:var(--warning)}
 .btn.danger{border-color:var(--danger);color:var(--danger)}
 .btn.flagc{border-color:var(--flag);color:var(--flag)}
+.btn.learnc{border-color:var(--learned);color:var(--learned)}
 .btn.sm{font-size:0.75rem;padding:6px 12px}
 .list-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--border);font-size:0.82rem}
 .list-item .dim{color:var(--muted);font-size:0.72rem}
@@ -51,6 +58,9 @@ nav{width:100%;background:var(--surface);border-bottom:1px solid var(--border);p
 .meta-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
 .badge{font-family:'DM Mono',monospace;font-size:0.6rem;padding:3px 7px;border-radius:3px;background:var(--surface);color:var(--muted);border:1px solid var(--border)}
 .badge.cat{background:rgba(78,201,176,0.1);color:var(--accent2);border-color:rgba(78,201,176,0.2)}
+.badge.diff1{background:rgba(78,201,176,0.1);color:#4ec9b0;border-color:rgba(78,201,176,0.2)}
+.badge.diff2{background:rgba(232,156,71,0.1);color:#e89c47;border-color:rgba(232,156,71,0.2)}
+.badge.diff3{background:rgba(244,71,71,0.1);color:#f44747;border-color:rgba(244,71,71,0.2)}
 .timer-el{font-family:'DM Mono',monospace;font-size:0.72rem;padding:3px 9px;border-radius:3px;border:1px solid var(--border);color:var(--text);margin-left:auto}
 .timer-el.warn{color:var(--warning);border-color:var(--warning)}
 .timer-el.crit{color:var(--danger);border-color:var(--danger)}
@@ -82,11 +92,14 @@ nav{width:100%;background:var(--surface);border-bottom:1px solid var(--border);p
 .check-progress{height:4px;background:var(--border);border-radius:2px;margin-bottom:5px;overflow:hidden}
 .check-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s}
 .loading{text-align:center;padding:40px 0;font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--muted);letter-spacing:0.08em}
-.qcount-info{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted);margin-top:6px}
+.qcount-info{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted);margin-top:8px}
+.diff-legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.diff-pip{font-family:'DM Mono',monospace;font-size:0.58rem;padding:2px 7px;border-radius:3px}
+.learned-item{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:8px 0;border-top:1px solid var(--border);font-size:0.82rem;line-height:1.5;color:var(--muted)}
+.learned-item .ctag{font-family:'DM Mono',monospace;font-size:0.6rem;white-space:nowrap;margin-top:2px}
 </style>
 </head>
 <body>
-
 <nav>
   <div class="nav-inner">
     <button class="nav-btn active" onclick="showTab('home',this)">Home</button>
@@ -95,11 +108,10 @@ nav{width:100%;background:var(--surface);border-bottom:1px solid var(--border);p
     <button class="nav-btn" onclick="showTab('stats',this)">Stats</button>
   </div>
 </nav>
-
 <div class="wrap">
 <div class="page-header">
   <div class="title">L2 Plumbing</div>
-  <div class="subtitle" id="subtitle">LOADING QUESTIONS...</div>
+  <div class="subtitle" id="subtitle">LOADING...</div>
 </div>
 
 <!-- HOME -->
@@ -112,14 +124,24 @@ nav{width:100%;background:var(--surface);border-bottom:1px solid var(--border);p
       <div class="stat-card"><div class="big" id="h-weak">0</div><div class="lbl">WEAK SPOTS</div></div>
       <div class="stat-card"><div class="big" id="h-avg">—</div><div class="lbl">AVG SCORE</div></div>
     </div>
-    <div class="sec-hd">Topic filter</div>
-    <div class="filters" id="hf">
-      <button class="fbtn active" onclick="setFilter('All',this,'hf')">All</button>
+    <div class="sec-hd">Quick start</div>
+    <div class="filter-group">
+      <div class="filter-label">Category</div>
+      <div class="filter-row" id="hf-cat"><button class="fbtn active" onclick="setCat('All',this,'hf-cat')">All</button></div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Difficulty</div>
+      <div class="filter-row" id="hf-diff">
+        <button class="fbtn active" id="hd-All" onclick="setDiff('All',this)">All</button>
+        <button class="fbtn d1" id="hd-1" onclick="setDiff(1,this)">1 · Recall</button>
+        <button class="fbtn d2" id="hd-2" onclick="setDiff(2,this)">2 · Confused</button>
+        <button class="fbtn d3" id="hd-3" onclick="setDiff(3,this)">3 · Application</button>
+      </div>
     </div>
     <div class="btn-row" style="margin-bottom:20px">
-      <button class="btn primary" onclick="startQuiz(false,false)">30 random</button>
-      <button class="btn warn" id="wsBtn" onclick="startQuiz(true,false)">⚡ Weak spots</button>
-      <button class="btn flagc" id="flagBtn" onclick="startQuiz(false,true)">⚑ Flagged</button>
+      <button class="btn primary" onclick="startQuiz('normal')">30 random</button>
+      <button class="btn warn" id="wsBtn" onclick="startQuiz('weak')">⚡ Weak spots</button>
+      <button class="btn flagc" id="flagBtn" onclick="startQuiz('flag')">⚑ Flagged</button>
     </div>
     <div class="sec-hd">Recent sessions</div>
     <div id="h-hist"><div class="empty-state">No sessions yet.</div></div>
@@ -134,49 +156,74 @@ nav{width:100%;background:var(--surface);border-bottom:1px solid var(--border);p
 <!-- QUIZ -->
 <div id="tab-quiz" class="screen">
   <div id="qsetup">
-    <div class="sec-hd">Topic filter</div>
-    <div class="filters" id="qf">
-      <button class="fbtn active" onclick="setFilter('All',this,'qf')">All</button>
+    <div class="filter-group">
+      <div class="filter-label">Category</div>
+      <div class="filter-row" id="qf-cat"><button class="fbtn active" onclick="setCat('All',this,'qf-cat')">All</button></div>
     </div>
-    <div class="sec-hd">Timer</div>
-    <div class="filters">
-      <button class="fbtn active" id="t-off" onclick="setTimer(0,this)">Off</button>
-      <button class="fbtn" id="t-20" onclick="setTimer(20,this)">20s</button>
-      <button class="fbtn" id="t-30" onclick="setTimer(30,this)">30s</button>
+    <div class="filter-group">
+      <div class="filter-label">Difficulty</div>
+      <div class="diff-legend">
+        <span class="diff-pip" style="background:rgba(78,201,176,0.12);color:#4ec9b0">1 = Recall</span>
+        <span class="diff-pip" style="background:rgba(232,156,71,0.12);color:#e89c47">2 = Commonly confused</span>
+        <span class="diff-pip" style="background:rgba(244,71,71,0.12);color:#f44747">3 = Application</span>
+      </div>
+      <div class="filter-row" id="qf-diff">
+        <button class="fbtn active" id="qd-All" onclick="setDiff('All',this)">All</button>
+        <button class="fbtn d1" id="qd-1" onclick="setDiff(1,this)">1 · Recall</button>
+        <button class="fbtn d2" id="qd-2" onclick="setDiff(2,this)">2 · Confused</button>
+        <button class="fbtn d3" id="qd-3" onclick="setDiff(3,this)">3 · Application</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Topic <span style="font-size:0.5rem;color:var(--muted)">(optional)</span></div>
+      <div class="filter-row" id="qf-tag"></div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Timer</div>
+      <div class="filter-row">
+        <button class="fbtn active" id="t-off" onclick="setTimer(0,this)">Off</button>
+        <button class="fbtn" id="t-20" onclick="setTimer(20,this)">20s</button>
+        <button class="fbtn" id="t-30" onclick="setTimer(30,this)">30s</button>
+      </div>
     </div>
     <div class="btn-row" style="margin-top:14px">
-      <button class="btn primary" onclick="startQuiz(false,false)">30 random</button>
-      <button class="btn warn" id="wsBtn2" onclick="startQuiz(true,false)">⚡ Weak spots</button>
-      <button class="btn flagc" id="flagBtn2" onclick="startQuiz(false,true)">⚑ Flagged</button>
+      <button class="btn primary" onclick="startQuiz('normal')">30 random</button>
+      <button class="btn warn" id="wsBtn2" onclick="startQuiz('weak')">⚡ Weak spots</button>
+      <button class="btn flagc" id="flagBtn2" onclick="startQuiz('flag')">⚑ Flagged</button>
     </div>
     <div id="qpool-info" class="qcount-info"></div>
   </div>
+
   <div id="qactive" style="display:none">
     <div id="ws-banner" class="ws-banner" style="display:none"></div>
     <div class="progress-track"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
     <div class="meta-row">
       <span class="badge cat" id="catTag"></span>
+      <span class="badge" id="diffTag"></span>
+      <span class="badge" id="topicTag"></span>
       <span class="badge" id="qcount"></span>
       <span class="badge">✓ <strong id="scoreEl">0</strong></span>
       <span class="badge">✗ <strong id="wrongEl">0</strong></span>
-      <span class="timer-el" id="timerEl" style="display:none">20s</span>
+      <span class="timer-el" id="timerEl" style="display:none"></span>
     </div>
     <div class="qtext" id="qtext"></div>
     <div class="options" id="opts"></div>
     <div class="fb" id="fb"></div>
     <div class="quiz-actions">
       <button class="btn primary sm" id="nbtn" style="display:none" onclick="nextQ()">Next →</button>
-      <button class="btn flagc sm" id="flagQBtn" style="display:none" onclick="flagCurrentQ()">⚑ Flag this</button>
+      <button class="btn flagc sm" id="flagQBtn" style="display:none" onclick="flagCurrentQ()">⚑ Flag</button>
+      <button class="btn learnc sm" id="learnedQBtn" style="display:none" onclick="toggleLearnedCurrentQ()">✓ Learned</button>
     </div>
   </div>
+
   <div id="qresult" style="display:none">
     <div class="result-big" id="r-pct"></div>
     <div class="result-sub" id="r-sub"></div>
     <div id="cleared-banner" class="cleared-msg" style="display:none"></div>
     <div class="btn-row" style="justify-content:center;margin-bottom:18px">
       <button class="btn primary" onclick="endQuiz()">Done</button>
-      <button class="btn" onclick="startQuiz(false,false)">Another 30</button>
-      <button class="btn warn" id="r-wsBtn" onclick="startQuiz(true,false)">⚡ Weak spots</button>
+      <button class="btn" onclick="startQuiz('normal')">Another 30</button>
+      <button class="btn warn" id="r-wsBtn" onclick="startQuiz('weak')">⚡ Weak spots</button>
     </div>
     <div class="sec-hd">Missed this session</div>
     <div id="r-missed"></div>
@@ -192,13 +239,22 @@ nav{width:100%;background:var(--surface);border-bottom:1px solid var(--border);p
   <div class="check-progress"><div class="check-progress-fill" id="check-fill" style="width:0%"></div></div>
   <div id="check-list"></div>
   <div class="btn-row" style="margin-top:14px">
-    <button class="btn danger sm" onclick="resetChecklist()">Reset progress</button>
+    <button class="btn danger sm" onclick="resetChecklist()">Reset checklist</button>
   </div>
+
   <div class="sec-hd" style="margin-top:22px">Flagged questions ⚑</div>
   <div id="flag-list"><div class="empty-state">No flagged questions yet.</div></div>
   <div class="btn-row" style="margin-top:10px">
-    <button class="btn flagc sm" id="drillFlagBtn" onclick="startQuiz(false,true)">⚑ Drill flagged</button>
+    <button class="btn flagc sm" id="drillFlagBtn" onclick="startQuiz('flag')">⚑ Drill flagged</button>
     <button class="btn danger sm" onclick="clearFlags()">Clear flags</button>
+  </div>
+
+  <div class="sec-hd" style="margin-top:22px">Learned questions ✓ <span id="learned-count" style="color:var(--learned)"></span></div>
+  <div id="learned-empty" class="empty-state">No questions marked as learned yet.</div>
+  <div id="learned-list"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn learnc sm" onclick="startQuiz('learned')">Drill learned</button>
+    <button class="btn danger sm" onclick="clearLearned()">Clear learned</button>
   </div>
 </div>
 
@@ -206,6 +262,8 @@ nav{width:100%;background:var(--surface);border-bottom:1px solid var(--border);p
 <div id="tab-stats" class="screen">
   <div class="sec-hd">Performance by category</div>
   <div id="cat-stats"></div>
+  <div class="sec-hd" style="margin-top:20px">Performance by difficulty</div>
+  <div id="diff-stats"></div>
   <div class="sec-hd" style="margin-top:20px">All sessions</div>
   <div id="all-hist"><div class="empty-state">No sessions yet.</div></div>
   <div class="sec-hd" style="margin-top:20px">Full weak spots list</div>
@@ -213,15 +271,11 @@ nav{width:100%;background:var(--surface);border-bottom:1px solid var(--border);p
 </div>
 
 </div>
-
 <script>
-const STORE='plumbing_v5';
+const STORE='plumbing_v6';
 const WEAK_SIZE=20,WEAK_PASS=2;
+let Q=[],CATEGORIES=[],TAGS_BY_CAT={};
 
-let Q=[];
-let CATEGORIES=[];
-
-// Checklist — hardcoded, edit here as topics grow
 const CHECKS=[
   {id:'c1',cat:'Electrical',text:'Class I / II / III — SELV and PELV definitions'},
   {id:'c2',cat:'Electrical',text:'Safe isolation — full 7-step sequence and correct order'},
@@ -237,12 +291,12 @@ const CHECKS=[
   {id:'c12',cat:'Scientific',text:'Plumbo solvency vs cupro solvency — named terms'},
   {id:'c13',cat:'Scientific',text:'Dezincification vs electrolytic corrosion — keep separate'},
   {id:'c14',cat:'Scientific',text:'LPHW flow/return differential — 20°C'},
-  {id:'c15',cat:'H&S',text:'RIDDOR — over-7-day vs over-3-day distinction'},
-  {id:'c16',cat:'H&S',text:'Improvement Notice — 21 days (not 15)'},
-  {id:'c17',cat:'H&S',text:'Asbestos — STOP → WITHDRAW → REPORT → Licensed contractor'},
-  {id:'c18',cat:'H&S',text:'Excavation spoil distance — 1m fixed, not depth-dependent'},
-  {id:'c19',cat:'H&S',text:'Risk score bands — Low 1-5 / Medium 6-12 / High 13-25'},
-  {id:'c20',cat:'H&S',text:'Acetylene max pressure — 15 PSI (working 5-8 PSI)'},
+  {id:'c15',cat:'Health & Safety',text:'RIDDOR — over-7-day vs over-3-day distinction'},
+  {id:'c16',cat:'Health & Safety',text:'Improvement Notice — 21 days (not 15)'},
+  {id:'c17',cat:'Health & Safety',text:'Asbestos — STOP → WITHDRAW → REPORT → Licensed contractor'},
+  {id:'c18',cat:'Health & Safety',text:'Excavation spoil distance — 1m fixed, not depth-dependent'},
+  {id:'c19',cat:'Health & Safety',text:'Risk score bands — Low 1-5 / Medium 6-12 / High 13-25'},
+  {id:'c20',cat:'Health & Safety',text:'Acetylene max pressure — 15 PSI (working 5-8 PSI)'},
   {id:'c21',cat:'Processes',text:'Copper pipe grades — R220/R250/R290 (not X/Y/Z)'},
   {id:'c22',cat:'Processes',text:'Pipe gain — subtract from measured length, not add'},
   {id:'c23',cat:'Processes',text:'Joist notch zone — 0.1-0.2 from support, top only, max 1/8 depth'},
@@ -253,71 +307,108 @@ const CHECKS=[
   {id:'c28',cat:'Construction',text:'Variation Orders — written, client-signed BEFORE work starts'},
   {id:'c29',cat:'Construction',text:'Medium risk (6-12) — do not stop work, take immediate action'},
   {id:'c30',cat:'Construction',text:'CDM notification thresholds — 30 days + 20 workers OR 500 person-days'},
+  {id:'c31',cat:'Cold Water',text:'Fluid categories 1-5 — examples and protection required for each'},
+  {id:'c32',cat:'Cold Water',text:'Warning pipe vs overflow pipe — size difference and purpose'},
+  {id:'c33',cat:'Cold Water',text:'Cold feed 25mm higher than cold distribution — reason'},
+  {id:'c34',cat:'Cold Water',text:'BS 1212 Parts 1-4 FOV — differences and uses'},
 ];
 
 function loadData(){try{return JSON.parse(localStorage.getItem(STORE))||newData();}catch(e){return newData();}}
-function newData(){return{totalAnswered:0,sessions:[],fails:{},catStats:{},streak:0,flagged:[],checks:{}};}
+function newData(){return{totalAnswered:0,sessions:[],fails:{},catStats:{},diffStats:{},streak:0,flagged:[],learned:[],checks:{}};}
 function saveData(d){try{localStorage.setItem(STORE,JSON.stringify(d));}catch(e){}}
-
 function qKey(q){return q.c+'||'+q.q;}
 
-function getWeakSpots(fails){
-  return Q.map(q=>({q,fails:fails[qKey(q)]||0})).filter(x=>x.fails>0).sort((a,b)=>b.fails-a.fails).slice(0,WEAK_SIZE);
+function activePool(){
+  const d=loadData();
+  return Q.filter(q=>!(d.learned||[]).includes(qKey(q)));
 }
-function getFlagged(d){return Q.filter(q=>(d.flagged||[]).includes(qKey(q)));}
+function getWeakSpots(fails){
+  return activePool().map(q=>({q,fails:fails[qKey(q)]||0})).filter(x=>x.fails>0).sort((a,b)=>b.fails-a.fails).slice(0,WEAK_SIZE);
+}
+function getFlagged(d){return activePool().filter(q=>(d.flagged||[]).includes(qKey(q)));}
+function getLearned(d){return Q.filter(q=>(d.learned||[]).includes(qKey(q)));}
+
+let activeCat='All',activeDiff='All',activeTag='All',timerSecs=0;
+
+function getFilteredPool(){
+  let pool=activePool();
+  if(activeCat!=='All')pool=pool.filter(q=>q.c===activeCat);
+  if(activeDiff!=='All')pool=pool.filter(q=>q.d===Number(activeDiff));
+  if(activeTag!=='All')pool=pool.filter(q=>q.t===activeTag);
+  return pool;
+}
 
 function buildFilterButtons(){
-  const groups=['hf','qf'];
-  groups.forEach(gid=>{
-    const el=document.getElementById(gid);
-    // keep All button, add category buttons
-    el.innerHTML='<button class="fbtn active" onclick="setFilter(\'All\',this,\''+gid+'\')">All</button>';
+  ['hf-cat','qf-cat'].forEach(gid=>{
+    const el=document.getElementById(gid);if(!el)return;
+    el.innerHTML='<button class="fbtn active" onclick="setCat(\'All\',this,\''+gid+'\')">All</button>';
     CATEGORIES.forEach(cat=>{
-      const btn=document.createElement('button');
-      btn.className='fbtn';
-      btn.textContent=cat;
-      btn.onclick=function(){setFilter(cat,this,gid);};
-      el.appendChild(btn);
+      const b=document.createElement('button');b.className='fbtn';b.textContent=cat;
+      b.onclick=function(){setCat(cat,this,gid);};el.appendChild(b);
     });
   });
-  // update subtitle
+  buildTagButtons();
   document.getElementById('subtitle').textContent=CATEGORIES.join(' · ');
-  // update pool info
   updatePoolInfo();
 }
 
+function buildTagButtons(){
+  const el=document.getElementById('qf-tag');if(!el)return;
+  el.innerHTML='<button class="fbtn tag active" onclick="setTag(\'All\',this)">All topics</button>';
+  const tags=activeCat==='All'?[...new Set(Q.map(q=>q.t))].sort():(TAGS_BY_CAT[activeCat]||[]);
+  tags.forEach(tag=>{
+    const b=document.createElement('button');b.className='fbtn tag';b.textContent=tag;
+    b.onclick=function(){setTag(tag,this);};el.appendChild(b);
+  });
+}
+
 function updatePoolInfo(){
-  const el=document.getElementById('qpool-info');
-  if(!el)return;
-  const pool=activeFilter==='All'?Q:Q.filter(q=>q.c===activeFilter);
-  el.textContent=pool.length+' questions in pool';
+  const el=document.getElementById('qpool-info');if(!el)return;
+  const pool=getFilteredPool();
+  const d=loadData();const lc=(d.learned||[]).length;
+  el.textContent=pool.length+' questions in pool'+(lc?' ('+lc+' learned hidden)':'');
+}
+
+function setCat(val,el,gid){
+  activeCat=val;activeTag='All';
+  document.querySelectorAll('#'+gid+' .fbtn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  buildTagButtons();updatePoolInfo();
+}
+function setTag(val,el){
+  activeTag=val;
+  document.querySelectorAll('#qf-tag .fbtn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');updatePoolInfo();
+}
+function setDiff(val,el){
+  activeDiff=val;
+  ['hd-All','hd-1','hd-2','hd-3','qd-All','qd-1','qd-2','qd-3'].forEach(id=>{const b=document.getElementById(id);if(b)b.classList.remove('active');});
+  const ids=['hd-'+val,'qd-'+val];ids.forEach(id=>{const b=document.getElementById(id);if(b)b.classList.add('active');});
+  updatePoolInfo();
+}
+function setTimer(s,el){
+  timerSecs=s;
+  ['t-off','t-20','t-30'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  el.classList.add('active');
 }
 
 function showTab(id,el){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  el.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');el.classList.add('active');
   if(id==='home')renderHome();
   if(id==='stats')renderStats();
   if(id==='revision')renderRevision();
 }
 
-let activeFilter='All',timerSecs=0,timerInt=null;
-let qs=[],cur=0,sc=0,wr=0,missed=[],answered=false,isWeak=false,isFlag=false;
-let wsConsec={},curQ=null;
-
-function setFilter(f,el,gid){
-  activeFilter=f;
-  document.querySelectorAll('#'+gid+' .fbtn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  updatePoolInfo();
-}
-
-function setTimer(s,el){
-  timerSecs=s;
-  ['t-off','t-20','t-30'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  el.classList.add('active');
+function modeLabel(mode,cat,diff,tag){
+  if(mode==='weak')return'⚡ Weak';
+  if(mode==='flag')return'⚑ Flagged';
+  if(mode==='learned')return'✓ Learned';
+  let l='📋 '+(cat||'All');
+  if(diff&&diff!=='All')l+=' D'+diff;
+  if(tag&&tag!=='All')l+=' #'+tag;
+  return l;
 }
 
 function renderHome(){
@@ -328,13 +419,11 @@ function renderHome(){
   document.getElementById('h-streak').textContent=d.streak||0;
   document.getElementById('h-weak').textContent=ws.length;
   document.getElementById('h-avg').textContent=sess.length?Math.round(sess.reduce((s,x)=>s+x.pct,0)/sess.length)+'%':'—';
-  ['wsBtn','wsBtn2','r-wsBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=ws.length===0;});
+  ['wsBtn','wsBtn2','r-wsBtn'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=ws.length===0;});
   const fd=getFlagged(d).length===0;
-  ['flagBtn','flagBtn2','drillFlagBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=fd;});
-  const hl=document.getElementById('h-hist');
-  hl.innerHTML=!sess.length?'<div class="empty-state">No sessions yet.</div>':sess.slice().reverse().slice(0,8).map(s=>`<div class="list-item"><span class="dim">${s.mode==='weak'?'⚡ Weak':s.mode==='flag'?'⚑ Flagged':'📋 '+s.filter} · ${s.total}q</span><span class="pct">${s.pct}%</span></div>`).join('');
-  const wl=document.getElementById('h-wl');
-  wl.innerHTML=!ws.length?'<div class="empty-state">None yet.</div>':ws.slice(0,5).map(w=>`<div class="weak-item"><span style="flex:1">${w.q.q}</span><span class="fails">${w.fails}✗</span></div>`).join('');
+  ['flagBtn','flagBtn2','drillFlagBtn'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=fd;});
+  document.getElementById('h-hist').innerHTML=!sess.length?'<div class="empty-state">No sessions yet.</div>':sess.slice().reverse().slice(0,8).map(s=>`<div class="list-item"><span class="dim">${modeLabel(s.mode,s.cat,s.diff,s.tag)} · ${s.total}q</span><span class="pct">${s.pct}%</span></div>`).join('');
+  document.getElementById('h-wl').innerHTML=!ws.length?'<div class="empty-state">None yet.</div>':ws.slice(0,5).map(w=>`<div class="weak-item"><span style="flex:1">${w.q.q}</span><span class="fails">${w.fails}✗</span></div>`).join('');
 }
 
 function renderStats(){
@@ -344,10 +433,19 @@ function renderStats(){
     const s=cs[cat]||{correct:0,total:0};
     const pct=s.total?Math.round(s.correct/s.total*100):0;
     const col=pct>=80?'var(--success)':pct>=60?'var(--warning)':'var(--danger)';
-    return `<div class="cat-bar-row"><div class="cat-bar-label"><span>${cat}</span><span style="font-family:'DM Mono',monospace;font-size:0.72rem;color:${col}">${pct}% (${s.correct}/${s.total})</span></div><div class="cat-bar-track"><div class="cat-bar-fill" style="width:${pct}%;background:${col}"></div></div></div>`;
+    return`<div class="cat-bar-row"><div class="cat-bar-label"><span>${cat}</span><span style="font-family:'DM Mono',monospace;font-size:0.72rem;color:${col}">${pct}% (${s.correct}/${s.total})</span></div><div class="cat-bar-track"><div class="cat-bar-fill" style="width:${pct}%;background:${col}"></div></div></div>`;
+  }).join('');
+  const ds=d.diffStats||{};
+  const dn={1:'Recall',2:'Commonly confused',3:'Application'};
+  const dc={1:'#4ec9b0',2:'#e89c47',3:'#f44747'};
+  document.getElementById('diff-stats').innerHTML=[1,2,3].map(dv=>{
+    const s=ds[dv]||{correct:0,total:0};
+    const pct=s.total?Math.round(s.correct/s.total*100):0;
+    const col=pct>=80?'var(--success)':pct>=60?'var(--warning)':'var(--danger)';
+    return`<div class="cat-bar-row"><div class="cat-bar-label"><span style="color:${dc[dv]}">D${dv} · ${dn[dv]}</span><span style="font-family:'DM Mono',monospace;font-size:0.72rem;color:${col}">${pct}% (${s.correct}/${s.total})</span></div><div class="cat-bar-track"><div class="cat-bar-fill" style="width:${pct}%;background:${col}"></div></div></div>`;
   }).join('');
   const sess=d.sessions||[];
-  document.getElementById('all-hist').innerHTML=!sess.length?'<div class="empty-state">No sessions yet.</div>':sess.slice().reverse().map(s=>`<div class="list-item"><span class="dim">${s.mode==='weak'?'⚡ Weak':s.mode==='flag'?'⚑ Flagged':'📋 '+s.filter} · ${s.total}q</span><span class="pct">${s.pct}%</span></div>`).join('');
+  document.getElementById('all-hist').innerHTML=!sess.length?'<div class="empty-state">No sessions yet.</div>':sess.slice().reverse().map(s=>`<div class="list-item"><span class="dim">${modeLabel(s.mode,s.cat,s.diff,s.tag)} · ${s.total}q</span><span class="pct">${s.pct}%</span></div>`).join('');
   const ws=getWeakSpots(d.fails||{});
   document.getElementById('full-weak').innerHTML=!ws.length?'<div class="empty-state">None yet.</div>':ws.map(w=>`<div class="weak-item"><span style="flex:1">${w.q.q}</span><span class="fails">${w.fails}✗</span></div>`).join('');
 }
@@ -359,44 +457,34 @@ function renderRevision(){
   const pct=Math.round(done/CHECKS.length*100);
   document.getElementById('check-pct').textContent=pct+'%';
   document.getElementById('check-fill').style.width=pct+'%';
-  document.getElementById('check-list').innerHTML=CHECKS.map(c=>`
-    <label class="check-item">
-      <input type="checkbox" ${checks[c.id]?'checked':''} onchange="toggleCheck('${c.id}')">
-      <div><span class="check-label${checks[c.id]?' done':''}">${c.text}</span><span class="check-cat">${c.cat}</span></div>
-    </label>`).join('');
+  document.getElementById('check-list').innerHTML=CHECKS.map(c=>`<label class="check-item"><input type="checkbox" ${checks[c.id]?'checked':''} onchange="toggleCheck('${c.id}')"><div><span class="check-label${checks[c.id]?' done':''}">${c.text}</span><span class="check-cat">${c.cat}</span></div></label>`).join('');
   const flagged=getFlagged(d);
   document.getElementById('flag-list').innerHTML=!flagged.length?'<div class="empty-state">No flagged questions yet.</div>':flagged.map(q=>`<div class="weak-item"><span style="flex:1">[${q.c}] ${q.q}</span><span style="color:var(--flag);font-size:0.72rem">⚑</span></div>`).join('');
+  const learned=getLearned(d);
+  document.getElementById('learned-count').textContent=learned.length?'('+learned.length+')':'';
+  document.getElementById('learned-empty').style.display=learned.length?'none':'block';
+  document.getElementById('learned-list').innerHTML=learned.map(q=>`<div class="learned-item"><span style="flex:1">${q.q}</span><span class="ctag">${q.c}</span></div>`).join('');
 }
 
-function toggleCheck(id){
-  const d=loadData();d.checks=d.checks||{};d.checks[id]=!d.checks[id];saveData(d);renderRevision();
-}
+function toggleCheck(id){const d=loadData();d.checks=d.checks||{};d.checks[id]=!d.checks[id];saveData(d);renderRevision();}
 function resetChecklist(){if(confirm('Reset checklist?')){const d=loadData();d.checks={};saveData(d);renderRevision();}}
 function clearFlags(){if(confirm('Clear all flagged questions?')){const d=loadData();d.flagged=[];saveData(d);renderRevision();renderHome();}}
+function clearLearned(){if(confirm('Unmark all learned questions? They will return to the normal pool.')){const d=loadData();d.learned=[];saveData(d);renderRevision();renderHome();updatePoolInfo();}}
 
 function shuf(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a;}
 
-function startQuiz(weakMode,flagMode){
+let qs=[],cur=0,sc=0,wr=0,missed=[],answered=false,quizMode='normal',wsConsec={},curQ=null,timerInt=null;
+
+function startQuiz(mode){
   stopTimer();
   const d=loadData();
-  isWeak=weakMode;isFlag=flagMode;
-  wsConsec={};missed=[];sc=0;wr=0;cur=0;answered=false;
+  quizMode=mode;wsConsec={};missed=[];sc=0;wr=0;cur=0;answered=false;
   document.getElementById('scoreEl').textContent=0;
   document.getElementById('wrongEl').textContent=0;
-
-  if(weakMode){
-    const ws=getWeakSpots(d.fails||{});
-    if(!ws.length){alert('No weak spots yet.');return;}
-    qs=shuf(ws.map(w=>w.q));
-  } else if(flagMode){
-    const fp=getFlagged(d);
-    if(!fp.length){alert('No flagged questions yet.');return;}
-    qs=shuf([...fp]);
-  } else {
-    const pool=activeFilter==='All'?Q:Q.filter(q=>q.c===activeFilter);
-    qs=shuf([...pool]).slice(0,30);
-  }
-
+  if(mode==='weak'){const ws=getWeakSpots(d.fails||{});if(!ws.length){alert('No weak spots yet.');return;}qs=shuf(ws.map(w=>w.q));}
+  else if(mode==='flag'){const fp=getFlagged(d);if(!fp.length){alert('No flagged questions.');return;}qs=shuf([...fp]);}
+  else if(mode==='learned'){const lq=getLearned(d);if(!lq.length){alert('No learned questions.');return;}qs=shuf([...lq]);}
+  else{const pool=getFilteredPool();if(!pool.length){alert('No questions match filters.');return;}qs=shuf([...pool]).slice(0,30);}
   document.getElementById('qsetup').style.display='none';
   document.getElementById('qactive').style.display='block';
   document.getElementById('qresult').style.display='none';
@@ -407,99 +495,109 @@ function startQuiz(weakMode,flagMode){
   loadQ();
 }
 
+function diffClass(dv){return dv===1?'diff1':dv===2?'diff2':'diff3';}
+function diffLabel(dv){return dv===1?'D1·Recall':dv===2?'D2·Confused':'D3·Application';}
+
 function loadQ(){
-  answered=false;
-  curQ=qs[cur];
-  const q=curQ;
-  const d=loadData();
+  answered=false;curQ=qs[cur];
+  const q=curQ,d=loadData();
   const banner=document.getElementById('ws-banner');
-  if(isWeak){banner.style.display='block';banner.textContent='⚡ Weak spots — '+getWeakSpots(d.fails||{}).length+' in pool. Pass twice to clear. Q'+(cur+1)+'/'+qs.length;}
-  else if(isFlag){banner.style.display='block';banner.textContent='⚑ Flagged questions — '+qs.length+' total. Q'+(cur+1)+'/'+qs.length;}
-  else{banner.style.display='none';}
+  if(quizMode==='weak'){banner.style.display='block';banner.textContent='⚡ Weak spots — pass twice to clear. Q'+(cur+1)+'/'+qs.length;}
+  else if(quizMode==='flag'){banner.style.display='block';banner.textContent='⚑ Flagged — Q'+(cur+1)+'/'+qs.length;}
+  else if(quizMode==='learned'){banner.style.display='block';banner.textContent='✓ Learned — Q'+(cur+1)+'/'+qs.length;}
+  else banner.style.display='none';
   document.getElementById('catTag').textContent=q.c;
-  document.getElementById('qcount').textContent=(cur+1)+' / '+qs.length;
+  const dt=document.getElementById('diffTag');dt.textContent=diffLabel(q.d);dt.className='badge '+diffClass(q.d);
+  document.getElementById('topicTag').textContent='#'+q.t;
+  document.getElementById('qcount').textContent=(cur+1)+'/'+qs.length;
   document.getElementById('pbar').style.width=Math.round(cur/qs.length*100)+'%';
   document.getElementById('qtext').textContent=q.q;
-  const fb=document.getElementById('fb');fb.className='fb';fb.textContent='';
+  document.getElementById('fb').className='fb';document.getElementById('fb').textContent='';
   document.getElementById('nbtn').style.display='none';
-  const fqb=document.getElementById('flagQBtn');
-  fqb.style.display='none';
-  fqb.textContent=(d.flagged||[]).includes(qKey(q))?'⚑ Unflag':'⚑ Flag this';
+  document.getElementById('flagQBtn').style.display='none';
+  document.getElementById('learnedQBtn').style.display='none';
+  document.getElementById('flagQBtn').textContent=(d.flagged||[]).includes(qKey(q))?'⚑ Unflag':'⚑ Flag';
+  document.getElementById('learnedQBtn').textContent=(d.learned||[]).includes(qKey(q))?'✓ Unlearn':'✓ Learned';
   const o=document.getElementById('opts');o.innerHTML='';
   const keys=['A','B','C','D'];
   const so=q.o.map((t,i)=>({t,orig:i}));shuf(so);
   so.forEach((opt,i)=>{
     const b=document.createElement('button');b.className='opt';
     b.innerHTML='<span class="okey">'+keys[i]+'</span>'+opt.t;
-    b.onclick=()=>pick(opt.orig===q.a,b,so,q);
-    o.appendChild(b);
+    b.onclick=()=>pick(opt.orig===q.a,b,so,q);o.appendChild(b);
   });
   if(timerSecs>0)startTimer();
 }
 
 function startTimer(){
-  stopTimer();
-  let rem=timerSecs;
+  stopTimer();let rem=timerSecs;
   const el=document.getElementById('timerEl');
   el.style.display='inline-block';el.className='timer-el';el.textContent=rem+'s';
   timerInt=setInterval(()=>{
     rem--;el.textContent=rem+'s';
     if(rem<=10)el.className='timer-el warn';
     if(rem<=5)el.className='timer-el crit';
-    if(rem<=0){
-      stopTimer();
-      if(!answered&&curQ){
-        const d=loadData();d.totalAnswered=(d.totalAnswered||0)+1;
-        const k=qKey(curQ);d.fails[k]=(d.fails[k]||0)+1;
-        d.catStats=d.catStats||{};d.catStats[curQ.c]=d.catStats[curQ.c]||{correct:0,total:0};
-        d.catStats[curQ.c].total++;d.streak=0;saveData(d);
-        answered=true;missed.push(curQ);wr++;document.getElementById('wrongEl').textContent=wr;
-        document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
-        const fb=document.getElementById('fb');fb.className='fb bad show';fb.textContent='⏱ Time up! ✗ '+curQ.e;
-        document.getElementById('nbtn').style.display='inline-block';
-        document.getElementById('flagQBtn').style.display='inline-block';
-      }
-    }
+    if(rem<=0){stopTimer();if(!answered&&curQ)timeUp();}
   },1000);
 }
 
-function stopTimer(){
-  if(timerInt){clearInterval(timerInt);timerInt=null;}
-  const el=document.getElementById('timerEl');if(el)el.style.display='none';
+function timeUp(){
+  const d=loadData();d.totalAnswered=(d.totalAnswered||0)+1;
+  const k=qKey(curQ);d.fails[k]=(d.fails[k]||0)+1;
+  d.catStats=d.catStats||{};d.catStats[curQ.c]=d.catStats[curQ.c]||{correct:0,total:0};d.catStats[curQ.c].total++;
+  d.diffStats=d.diffStats||{};d.diffStats[curQ.d]=d.diffStats[curQ.d]||{correct:0,total:0};d.diffStats[curQ.d].total++;
+  d.streak=0;saveData(d);
+  answered=true;missed.push(curQ);wr++;document.getElementById('wrongEl').textContent=wr;
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('fb');fb.className='fb bad show';fb.textContent='⏱ Time up! ✗ '+curQ.e;
+  document.getElementById('nbtn').style.display='inline-block';
+  document.getElementById('flagQBtn').style.display='inline-block';
+  document.getElementById('learnedQBtn').style.display='inline-block';
 }
+
+function stopTimer(){if(timerInt){clearInterval(timerInt);timerInt=null;}const el=document.getElementById('timerEl');if(el)el.style.display='none';}
 
 function pick(correct,btn,so,q){
   if(answered)return;stopTimer();answered=true;
   const d=loadData();d.totalAnswered=(d.totalAnswered||0)+1;
   const k=qKey(q);
   d.catStats=d.catStats||{};d.catStats[q.c]=d.catStats[q.c]||{correct:0,total:0};d.catStats[q.c].total++;
+  d.diffStats=d.diffStats||{};d.diffStats[q.d]=d.diffStats[q.d]||{correct:0,total:0};d.diffStats[q.d].total++;
   document.querySelectorAll('.opt').forEach((b,i)=>{b.disabled=true;if(so[i].orig===q.a)b.classList.add('correct');});
   const fb=document.getElementById('fb');
   if(correct){
     btn.classList.add('correct');sc++;document.getElementById('scoreEl').textContent=sc;
-    d.catStats[q.c].correct++;d.streak=(d.streak||0)+1;
+    d.catStats[q.c].correct++;d.diffStats[q.d].correct++;d.streak=(d.streak||0)+1;
     let msg='✓ '+q.e;
-    if(isWeak){wsConsec[k]=(wsConsec[k]||0)+1;if(wsConsec[k]>=WEAK_PASS){delete d.fails[k];msg='✓ '+q.e+' — Cleared!';}else{msg='✓ '+q.e+' — Pass '+wsConsec[k]+'/'+WEAK_PASS+' to clear.';}}
+    if(quizMode==='weak'){wsConsec[k]=(wsConsec[k]||0)+1;if(wsConsec[k]>=WEAK_PASS){delete d.fails[k];msg='✓ '+q.e+' — Cleared!';}else msg='✓ '+q.e+' — Pass '+wsConsec[k]+'/'+WEAK_PASS+' to clear.';}
     fb.className='fb ok show';fb.textContent=msg;
   } else {
     btn.classList.add('wrong');wr++;document.getElementById('wrongEl').textContent=wr;
     missed.push(q);d.fails[k]=(d.fails[k]||0)+1;d.streak=0;
-    if(isWeak)wsConsec[k]=0;
+    if(quizMode==='weak')wsConsec[k]=0;
     fb.className='fb bad show';fb.textContent='✗ '+q.e;
   }
   saveData(d);
   document.getElementById('nbtn').style.display='inline-block';
   document.getElementById('flagQBtn').style.display='inline-block';
-  document.getElementById('flagQBtn').textContent=(d.flagged||[]).includes(k)?'⚑ Unflag':'⚑ Flag this';
+  document.getElementById('learnedQBtn').style.display='inline-block';
+  const d2=loadData();
+  document.getElementById('flagQBtn').textContent=(d2.flagged||[]).includes(k)?'⚑ Unflag':'⚑ Flag';
+  document.getElementById('learnedQBtn').textContent=(d2.learned||[]).includes(k)?'✓ Unlearn':'✓ Learned';
 }
 
 function flagCurrentQ(){
-  if(!curQ)return;
-  const d=loadData();d.flagged=d.flagged||[];
-  const k=qKey(curQ);
-  if(d.flagged.includes(k)){d.flagged=d.flagged.filter(f=>f!==k);document.getElementById('flagQBtn').textContent='⚑ Flag this';}
+  if(!curQ)return;const d=loadData();d.flagged=d.flagged||[];const k=qKey(curQ);
+  if(d.flagged.includes(k)){d.flagged=d.flagged.filter(f=>f!==k);document.getElementById('flagQBtn').textContent='⚑ Flag';}
   else{d.flagged.push(k);document.getElementById('flagQBtn').textContent='⚑ Unflag';}
   saveData(d);
+}
+
+function toggleLearnedCurrentQ(){
+  if(!curQ)return;const d=loadData();d.learned=d.learned||[];const k=qKey(curQ);
+  if(d.learned.includes(k)){d.learned=d.learned.filter(f=>f!==k);document.getElementById('learnedQBtn').textContent='✓ Learned';}
+  else{d.learned.push(k);document.getElementById('learnedQBtn').textContent='✓ Unlearn';}
+  saveData(d);updatePoolInfo();
 }
 
 function nextQ(){cur++;if(cur>=qs.length)showResult();else loadQ();}
@@ -508,49 +606,34 @@ function showResult(){
   stopTimer();
   const pct=Math.round(sc/qs.length*100);
   document.getElementById('r-pct').textContent=pct+'%';
-  document.getElementById('r-sub').textContent=sc+' / '+qs.length+(isWeak?' · weak spots':isFlag?' · flagged':' · '+activeFilter);
+  document.getElementById('r-sub').textContent=sc+'/'+qs.length+' · '+modeLabel(quizMode,activeCat,activeDiff,activeTag);
   const cleared=Object.keys(wsConsec).filter(k=>wsConsec[k]>=WEAK_PASS).length;
   const cb=document.getElementById('cleared-banner');
-  if(isWeak&&cleared>0){cb.style.display='block';cb.textContent='✓ '+cleared+' question'+(cleared>1?'s':'')+' cleared.';}
-  else{cb.style.display='none';}
+  if(quizMode==='weak'&&cleared>0){cb.style.display='block';cb.textContent='✓ '+cleared+' question'+(cleared>1?'s':'')+' cleared.';}else cb.style.display='none';
   const d=loadData();d.sessions=d.sessions||[];
-  d.sessions.push({pct,total:qs.length,mode:isWeak?'weak':isFlag?'flag':'normal',filter:activeFilter,ts:Date.now()});
+  d.sessions.push({pct,total:qs.length,mode:quizMode,cat:activeCat,diff:activeDiff,tag:activeTag,ts:Date.now()});
   if(d.sessions.length>100)d.sessions=d.sessions.slice(-100);
   saveData(d);
-  const ml=document.getElementById('r-missed');
-  ml.innerHTML=!missed.length?'<div class="empty-state" style="color:var(--success)">Clean sheet.</div>':missed.map(q=>`<div class="missed-item"><strong>[${q.c}]</strong> ${q.q}<br><span style="color:var(--muted);font-size:0.76rem">${q.e}</span></div>`).join('');
+  document.getElementById('r-missed').innerHTML=!missed.length?'<div class="empty-state" style="color:var(--success)">Clean sheet.</div>':missed.map(q=>`<div class="missed-item"><strong>[${q.c}]</strong> ${q.q}<br><span style="color:var(--muted);font-size:0.76rem">${q.e}</span></div>`).join('');
   document.getElementById('qactive').style.display='none';
   document.getElementById('qresult').style.display='block';
 }
 
-function endQuiz(){
-  document.getElementById('qresult').style.display='none';
-  document.getElementById('qsetup').style.display='block';
-  renderHome();
-}
+function endQuiz(){document.getElementById('qresult').style.display='none';document.getElementById('qsetup').style.display='block';renderHome();}
+function clearData(){if(confirm('Clear all data?')){try{localStorage.removeItem(STORE);}catch(e){}location.reload();}}
 
-function clearData(){if(confirm('Clear all data?')){try{localStorage.removeItem(STORE);}catch(e){}renderHome();}}
-
-// Load questions from external JSON
 fetch('questions.json')
-  .then(r=>{
-    if(!r.ok)throw new Error('Failed to load questions.json');
-    return r.json();
-  })
+  .then(r=>{if(!r.ok)throw new Error('Failed to load questions.json');return r.json();})
   .then(data=>{
     Q=data.questions;
-    // derive categories from questions
-    const catSet=new Set(Q.map(q=>q.c));
-    CATEGORIES=[...catSet];
+    CATEGORIES=[...new Set(Q.map(q=>q.c))];
+    CATEGORIES.forEach(cat=>{TAGS_BY_CAT[cat]=[...new Set(Q.filter(q=>q.c===cat).map(q=>q.t))].sort();});
     buildFilterButtons();
     document.getElementById('loading-msg').style.display='none';
     document.getElementById('home-content').style.display='block';
-    renderHome();
-    renderRevision();
+    renderHome();renderRevision();
   })
-  .catch(err=>{
-    document.getElementById('loading-msg').textContent='Error loading questions.json — make sure it is in the same folder as index.html. ('+err.message+')';
-  });
+  .catch(err=>{document.getElementById('loading-msg').textContent='Error loading questions.json — '+err.message;});
 </script>
 </body>
 </html>
